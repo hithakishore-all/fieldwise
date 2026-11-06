@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fieldwise · guided demo</title>
+<meta name="description" content="Fieldwise carries one equipment problem from the support call to a verified fix on a technician's phone. Synthetic data, runs in your browser.">
+<meta property="og:title" content="Fieldwise · Your next move, made clear.">
+<meta property="og:description" content="Cited, approved, model-specific service procedures from the call to the fix. Synthetic demo.">
+<meta property="og:image" content="https://hithakishore-all.github.io/img/fieldwise-poster.jpg">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='1' y='1' width='30' height='30' rx='9' fill='%232450D8'/%3E%3Cpath d='M9.5 22.5L18 14' stroke='%23fff' stroke-width='4.6' stroke-linecap='round'/%3E%3Ccircle cx='21' cy='11' r='5.4' fill='%23fff'/%3E%3Crect x='19.4' y='3.2' width='3.2' height='7' rx='0.8' fill='%232450D8' transform='rotate(45 21 11)'/%3E%3Ccircle cx='10' cy='22' r='1.5' fill='%23D97706'/%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:wght@400;600&display=swap">
+<style>
+/* Layout: guided walkthrough — scenario tabs, a narrator column that says who you are and what to do, and one screen at a time */
+:root{
+  --bg:#F3F5FA; --surface:#FFFFFF; --sunk:#EAEEF7; --ink:#141B2D; --muted:#59627A; --line:#D6DCEA; --accent:#2450D8; --accent-soft:#E3EAFF; --signal:#D97706; --signal-soft:#FFF1D6; --ok:#12805C; --ok-soft:#DCF4EA; --bad:#C62E3A; --bad-soft:#FDE4E6; --chrome:#16213E; --chrome-ink:#E8ECF7; --p-ana:#2450D8; --p-teo:#E0641B; --p-ari:#7A3FD1; --p-ren:#12805C; --p-mia:#6B7280;
+  --f-display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --f-body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0C1120; --surface:#151C2E; --sunk:#10172A; --ink:#E6EAF5; --muted:#9AA4BE; --line:#27304A; --accent:#7B98FF; --accent-soft:#1D2856; --signal:#F5B400; --signal-soft:#3A2C08; --ok:#3CC594; --ok-soft:#0F2E22; --bad:#F06470; --bad-soft:#3D1519; --chrome:#060A15; --chrome-ink:#C8D0E6; --p-ana:#7B98FF; --p-teo:#FF8A47; --p-ari:#AD82F2; --p-ren:#3CC594; --p-mia:#9AA4BE; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0C1120; --surface:#151C2E; --sunk:#10172A; --ink:#E6EAF5; --muted:#9AA4BE; --line:#27304A; --accent:#7B98FF; --accent-soft:#1D2856; --signal:#F5B400; --signal-soft:#3A2C08; --ok:#3CC594; --ok-soft:#0F2E22; --bad:#F06470; --bad-soft:#3D1519; --chrome:#060A15; --chrome-ink:#C8D0E6; --p-ana:#7B98FF; --p-teo:#FF8A47; --p-ari:#AD82F2; --p-ren:#3CC594; --p-mia:#9AA4BE; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45;margin:0;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.wrap{max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:28px;display:flex;align-items:center;gap:10px}
+.mark{width:30px;height:30px;flex:none;display:block} h2{font-size:20px} h3{font-size:14px}
+p{margin:0}
+.mono{font-family:var(--f-mono);font-size:12.5px}
+.muted{color:var(--muted)}
+button{font:inherit;font-weight:600;cursor:pointer;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:7px 12px}
+button:hover:not(:disabled){border-color:var(--accent)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+button:disabled{opacity:.45;cursor:not-allowed}
+button.link{border:0;background:none;padding:0;color:var(--accent);text-decoration:underline;text-underline-offset:2px}
+button.do{outline:3px solid var(--signal);outline-offset:3px}
+@media (prefers-reduced-motion:no-preference){button.do{animation:pulse 1.6s ease-in-out infinite}@keyframes pulse{50%{outline-offset:6px}}}
+select,input[type=text]{font:inherit;padding:7px 9px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
+.tag{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.synth{font-family:var(--f-mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;border:1px dashed var(--signal);color:var(--signal);padding:5px 9px;border-radius:4px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tabs button{display:flex;flex-direction:column;align-items:flex-start;text-align:left;font-weight:400;padding:9px 12px;min-width:0}
+.tabs button b{font-family:var(--f-display);font-size:14px}
+.tabs button span{font-size:12.5px;color:var(--muted)}
+.tabs button[aria-selected="true"]{border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 -3px 0 var(--accent)}
+.main{display:grid;grid-template-columns:320px minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:900px){.main{grid-template-columns:minmax(0,1fr)}}
+/* narrator */
+.narr{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:12px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px)}
+@media (max-width:900px){.narr{position:static}}
+.count{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.dots{display:flex;gap:4px}
+.dots button{flex:1;height:8px;padding:0;border:0;border-radius:3px;background:var(--line);min-width:0}
+.dots button{background:var(--line);box-shadow:inset 0 -3px 0 var(--dc)}
+.dots button.on{background:var(--dc)}
+.persona{display:flex;gap:10px;align-items:center;background:var(--sunk);border-radius:8px;padding:8px 10px;box-shadow:inset 3px 0 0 var(--pc,var(--accent))}
+.av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-display);font-weight:700;color:#fff;background:var(--pc,var(--accent));flex:none}
+.persona small{display:block;color:var(--muted);font-size:12px}
+.why{font-size:15px}
+.todo{border-left:3px solid var(--signal);background:var(--signal-soft);border-radius:0 6px 6px 0;padding:8px 10px;font-weight:600}
+.rec{font-size:13px;display:flex;flex-direction:column;gap:4px;border-top:1px solid var(--line);padding-top:10px}
+.rec li{margin-left:16px}
+.rec ul{margin:0;padding:0}
+.navrow{display:flex;justify-content:space-between;gap:8px}
+/* screens */
+.screen{background:var(--surface);border:1px solid var(--line);box-shadow:0 1px 0 var(--line),0 8px 24px -16px rgba(20,27,45,.35);border-radius:10px;overflow:hidden;min-width:0}
+.chrome{border-top:4px solid var(--pc,var(--accent));background:var(--chrome);color:var(--chrome-ink);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:8px 14px;font-family:var(--f-mono);font-size:12px}
+.host-row{display:grid;grid-template-columns:200px minmax(0,1fr);min-height:420px}
+@media (max-width:700px){.host-row{grid-template-columns:minmax(0,1fr)}}
+.host-side{background:var(--sunk);border-right:1px solid var(--line);padding:12px;display:flex;flex-direction:column;gap:8px;font-size:13px}
+.host-side .hc{border:1px solid var(--line);border-radius:6px;padding:7px 9px;background:var(--surface)}
+.host-side .hc.sel{border-color:var(--accent)}
+.embed{padding:14px 16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.embed-h{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center;border-bottom:1px solid var(--line);padding-bottom:8px}
+.embed-h b{font-family:var(--f-display)}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
+.fact{border:1px solid var(--line);border-radius:6px;padding:7px 10px;background:var(--sunk);min-width:0}
+.fact .k{font-size:12px;color:var(--muted)}
+.fact .v{font-weight:600;overflow-wrap:anywhere}
+.chip{display:inline-block;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;padding:1px 6px;border-radius:3px;border:1px solid currentColor;vertical-align:1px;white-space:nowrap}
+.chip.obs{color:var(--ok)} .chip.unk{color:var(--signal)} .chip.conf{color:var(--accent)} .chip.inf{color:var(--muted);border-style:dashed} .chip.bad{color:var(--bad)}
+.quote{border-left:3px solid var(--line);padding:2px 0 2px 12px;font-size:17px}
+.quote small{display:block;color:var(--muted);font-size:12px}
+.chat{display:flex;flex-direction:column;gap:8px;background:var(--sunk);border-radius:8px;padding:10px}
+.msg{max-width:94%;padding:9px 12px;border-radius:8px;background:var(--surface);border:1px solid var(--line)}
+.msg.me{align-self:flex-end;background:var(--accent-soft);border-color:transparent}
+.kind{font-family:var(--f-mono);font-size:11px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.kind.clarify{color:var(--signal)} .kind.answer{color:var(--ok)} .kind.escalate{color:var(--bad)} .kind.note{color:var(--muted)}
+.cite{font-family:var(--f-mono);font-size:12px;border:1px solid var(--accent);color:var(--accent);background:none;padding:1px 6px;border-radius:4px;font-weight:500}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.callout{border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.callout.ok{border-color:var(--ok);background:var(--ok-soft)}
+.callout.warn{border-color:var(--signal);background:var(--signal-soft)}
+.callout.bad{border-color:var(--bad);background:var(--bad-soft)}
+.http{font-family:var(--f-mono);font-size:12px;font-weight:500;padding:1px 6px;border-radius:3px;background:var(--surface);border:1px solid currentColor}
+.preview{font-family:var(--f-mono);font-size:12.5px;background:var(--sunk);border-radius:6px;padding:10px 12px;white-space:pre-wrap;overflow-wrap:anywhere}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;color:var(--muted);font-weight:600}
+.tbl{overflow-x:auto}
+/* phone */
+.phone-stage{padding:20px 12px;background:var(--sunk);display:flex;justify-content:center}
+.phone{width:100%;max-width:340px;border:10px solid var(--chrome);box-shadow:0 18px 40px -20px rgba(20,27,45,.5);border-radius:30px;background:var(--bg);overflow:hidden}
+.phone-top{display:flex;justify-content:space-between;padding:8px 14px;font-family:var(--f-mono);font-size:11px;color:var(--muted);border-bottom:1px solid var(--line)}
+.phone-b{padding:14px;display:flex;flex-direction:column;gap:11px;min-height:440px}
+.step-id{font-family:var(--f-mono);font-size:12px;color:var(--accent)}
+.step-prompt{font-family:var(--f-display);font-size:19px;line-height:1.25}
+.answers{display:grid;gap:8px}
+.answers button{padding:12px;font-size:16px;text-align:left}
+.progress{display:flex;gap:4px}
+.progress span{flex:1;height:4px;border-radius:2px;background:var(--line)}
+.progress span.on{background:var(--accent)}
+.graph-wrap{overflow-x:auto}
+.graph-wrap svg{display:block;min-width:500px;width:100%;height:auto}
+.checks{display:flex;flex-direction:column;gap:10px}
+.hgrid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:14px;align-items:start}
+@media (max-width:760px){.hgrid{grid-template-columns:minmax(0,1fr)}}
+.tree,.tree ul{list-style:none;margin:0;padding:0}
+.tree ul{padding-left:18px;margin-left:10px;border-left:1px solid var(--line)}
+.tree li{padding-top:8px}
+.hnode{border:1px solid var(--line);border-radius:6px;padding:6px 10px;background:var(--surface);display:flex;flex-direction:column;min-width:0}
+.hnode span{font-size:12.5px;color:var(--muted)}
+.hnode.sel{border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 3px 0 0 var(--accent)}
+.hnode.dim{opacity:.6}
+/* drawer */
+.drawer{position:fixed;inset:0;background:rgba(10,18,22,.45);display:flex;justify-content:flex-end;z-index:20}
+.drawer-in{width:min(440px,100%);height:100%;background:var(--surface);padding:22px max(20px,env(safe-area-inset-right,0px)) 22px 20px;display:flex;flex-direction:column;gap:12px;overflow:auto}
+.sheet{border:1px solid var(--line);border-radius:6px;padding:16px;background:var(--sunk)}
+.sheet .pg{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.sheet p{font-size:17px;margin-top:12px}
+.foot{font-size:13px;color:var(--muted)}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header class="top">
+    <div><h1><svg class="mark" viewBox="0 0 32 32" role="img" aria-label="Fieldwise mark"><rect x="1" y="1" width="30" height="30" rx="9" fill="var(--accent)"/><path d="M9.5 22.5L18 14" stroke="#fff" stroke-width="4.6" stroke-linecap="round"/><circle cx="21" cy="11" r="5.4" fill="#fff"/><rect x="19.4" y="3.2" width="3.2" height="7" rx="0.8" fill="var(--accent)" transform="rotate(45 21 11)"/><circle cx="10" cy="22" r="1.5" fill="var(--signal)"/></svg>Fieldwise</h1><span class="tag">Your next move, made clear.</span></div>
+    <span class="synth">Synthetic demo · all equipment, manuals and people are fictional</span>
+  </header>
+  <div class="tabs" role="tablist" id="tabs"></div>
+  <div class="main">
+    <aside class="narr" id="narr" aria-live="polite"></aside>
+    <section class="screen" id="screen"></section>
+  </div>
+  <p class="foot">A guided walkthrough that runs entirely in your browser with synthetic data. The production build (FastAPI + PostgreSQL) enforces the same rules on the server and is in progress. The assistant uses scripted retrieval and response templates, not a live model. <a href="https://hithakishore-all.github.io/">← Back to portfolio</a></p>
+</div>
+
+<div class="drawer" id="drawer" hidden>
+  <div class="drawer-in" role="dialog" aria-modal="true" aria-labelledby="dr-h">
+    <div class="row" style="justify-content:space-between"><h2 id="dr-h">Cited passage</h2><button id="drClose">Close</button></div>
+    <div id="drBody"></div>
+  </div>
+</div>
+
+<script>
+/* ---------- fictional seed data ---------- */
+const PASSAGES={
+  'MA1-p8':{src:'MA1',title:'Model A service manual',model:'A',rev:'1',page:8,status:'current',text:'Inspect the blue indicator in simulator A.'},
+  'MB2-p14':{src:'MB2',title:'Model B service manual',model:'B',rev:'2',page:14,status:'current',text:'Read indicator B in the simulator. Record green, amber or unreadable.'},
+  'MB2-p15':{src:'MB2',title:'Model B service manual',model:'B',rev:'2',page:15,status:'current',text:'Run the B simulator self-test and record its result.'},
+  'MB1-p9':{src:'MB1',title:'Model B service manual (old)',model:'B',rev:'1',page:9,status:'superseded',text:'Use legacy dial B.'}
+};
+const HISTORY={
+  H1:{title:'H1 · D17 on Model B rev 2',outcome:'verified recovery',body:'Attempt 1: self-test only, service not restored. Attempt 2: indicator check, then self-test, verified recovery. Only attempt 2 counts as the fix.'},
+  H2:{title:'H2 · D17 on Model B rev 2',outcome:'unknown',body:'Indicator green, self-test run. Technician left before verification, so the outcome stays unknown.'}
+};
+const NODES={
+  K1:{prompt:'Read indicator B in the simulator.',cite:'MB2-p14',answers:{green:'K2',amber:'E1',unreadable:'E2'}},
+  K2:{prompt:'Run the B simulator self-test and record its result.',cite:'MB2-p15',answers:{pass:'V1',fail:'E1',unknown:'E2'}},
+  V1:{prompt:'Was simulated service restored?',cite:null,answers:{yes:'R',no:'E3',unknown:'E3'}}
+};
+const TERM={
+  R:{kind:'resolved',text:'Resolved: simulated service restored.'},
+  E1:{kind:'escalate',text:'Escalation E1: simulated indicator anomaly.',q:'What is causing the indicator anomaly on B002?'},
+  E2:{kind:'escalate',text:'Escalation E2: a readable observation is needed.',q:'Can someone on site get a readable indicator or self-test result?'},
+  E3:{kind:'escalate',text:'Escalation E3: service not verified as restored.',q:'Why does D17 persist after a passing self-test?'}
+};
+const LBL={green:'Green',amber:'Amber',unreadable:'Unreadable',pass:'Pass',fail:'Fail',unknown:'Unknown',yes:'Yes, restored',no:'No'};
+const PEOPLE={Ana:'Support agent',Teo:'Technician (assigned)',Ari:'Knowledge author',Ren:'Reviewer',Mia:'Technician (not assigned)'};
+
+/* ---------- state ---------- */
+function init(){return{
+  model:null,rev:null,chat:[],assigned:null,run:null,outcome:null,approved:false,
+  delivery:null,feedback:null,audit:[],refreshed:false,tried:{},v2:false,v1:'published',mb2:'current',
+  imported:0,reimported:false,draftChecked:false,draftFixed:false,selfBlocked:false,newRun:null,
+  caseSel:'C104'
+}}
+let ts=0;
+function log(s,actor,text){s.audit.push({n:++ts,actor,text})}
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const loc=k=>{const p=PASSAGES[k];return `${p.src} · rev ${p.rev} · p${p.page}`};
+const cite=k=>`<button class="cite" data-cite="${k}">${loc(k)}</button>`;
+const fact=(k,v,chip)=>`<div class="fact"><div class="k">${k}</div><div class="v">${v} ${chip||''}</div></div>`;
+
+/* ---------- shared actions ---------- */
+function askD17(s,text){
+  s.chat.push({me:true,text});
+  if(!(s.model&&s.rev)){
+    s.chat.push({kind:'clarify',html:'D17 appears in the manuals for <b>two models</b>. Confirm the <b>model and revision</b> before I give any steps.<div class="muted" style="margin-top:4px">Model-specific steps returned: 0</div>'});
+    log(s,'Ana','Asked about D17 → clarify. Missing: model, revision. 0 steps.');
+  } else if(s.mb2==='withdrawn'){
+    s.chat.push({kind:'escalate',html:'The only manual that covered this was withdrawn. No current evidence or approved procedure applies, so escalate with the caller’s words.'});
+    log(s,'Ana','Asked about D17 → escalate: MB2 withdrawn, no applicable guidance.');
+  } else {
+    s.chat.push({kind:'answer',html:`For Model B rev 2, start by reading indicator B. ${cite('MB2-p14')}
+      <div style="margin-top:8px"><b>1 verified recovery in 2 matching cases</b>: <button class="link" data-hist="H1">H1</button> · <button class="link" data-hist="H2">H2</button></div>
+      <div class="muted" style="font-size:13px">Past cases support a hypothesis. They never authorize a step on their own.</div>
+      <div style="margin-top:6px">Approved procedure: <b>PB2 v1</b> (scope Model B rev 2)</div>
+      <div class="muted" style="font-size:13px;margin-top:4px">Left out: ${loc('MA1-p8')} (Model A) · ${loc('MB1-p9')} (superseded)</div>`});
+    log(s,'Ana','Asked about D17 → answer citing MB2 p14, history H1+H2, PB2 v1 eligible.');
+  }
+}
+function confirm(s,m,r){s.model=m;s.rev=r;log(s,'Ana',`Confirmed Model ${m} rev ${r}. Stored as observation O2, attributed to Ana.`)}
+function startRun(s){s.run={id:'RUN-7Q2F',pinned:1,version:1,status:'active',current:'K1',history:[]};s.assigned='Teo';log(s,'Ana','Started RUN-7Q2F pinned to PB2 v1 and assigned C104 to Teo.')}
+function tap(s,ans){
+  const r=s.run,n=NODES[r.current],next=n.answers[ans];
+  r.history.push({step:r.current,answer:ans,cite:n.cite});r.version++;
+  log(s,'Teo',`${r.current} = “${LBL[ans]}” → ${next}. Run version ${r.version}.`);
+  r.current=next;
+  if(TERM[next]&&TERM[next].kind==='escalate'){r.status='escalated';s.outcome={kind:'escalate',text:TERM[next].text,q:TERM[next].q};log(s,'System',`Escalation ${next} opened with attempted steps and open question.`)}
+}
+function verify(s){s.outcome={kind:'resolved',action:'Recorded indicator and self-test per PB2; no parts replaced.',note:'Doors cycled 10 times in simulator; no reopen; D17 cleared.'};s.run.status='resolved';s.run.current='done';s.feedback='helpful';log(s,'Teo','Recorded resolved outcome, action taken and verification note. Step feedback: K1 helpful.')}
+function approve(s){s.approved=true;s.delivery={status:'queued',attempts:0};log(s,'Ana','Approved host update. Queued once as delivery DLV-C104-1.')}
+function sendFail(s){s.delivery.attempts++;s.delivery.status='failed';log(s,'Outbox','DLV-C104-1 failed: simulated host outage. Outcome and evidence kept locally.')}
+function sendOk(s){s.delivery.attempts++;s.delivery.status='delivered';s.delivery.receipt='RCPT-0091';log(s,'Mock host','Received DLV-C104-1 once. Receipt RCPT-0091.')}
+function sendAgain(s){s.delivery.attempts++;log(s,'Outbox','Retry of DLV-C104-1: already delivered, same receipt RCPT-0091.')}
+
+/* ---------- screens ---------- */
+function hostScreen(s,inner,opts={}){
+  const cases=[['C104','doors keep reopening, D17'],['C105','car stops between floors']];
+  return `<div class="chrome"><span>Northline Service Desk (mock host)</span><span>Signed in: ${opts.who||'Ana'} · demo identity</span></div>
+  <div class="host-row"><div class="host-side"><b class="muted" style="font-size:12px">MY CASES</b>
+   ${cases.map(([id,t])=>`<div class="hc ${s.caseSel===id?'sel':''}"><b class="mono">${id}</b><br><span class="muted">${t}</span></div>`).join('')}
+   <div class="muted" style="font-size:12px;margin-top:auto">Fieldwise is embedded on the right. Case data stays on the Fieldwise server.</div></div>
+   <div class="embed"><div class="embed-h"><b>Fieldwise</b><span class="mono muted">${s.caseSel} · ${s.caseSel==='C104'?'asset B002':'asset B007'}</span></div>${inner}</div></div>`;
+}
+function caseFacts(s){
+  const mc=s.model?'<span class="chip conf">confirmed · Ana</span>':'<span class="chip unk">unknown</span>';
+  const rc=s.rev?'<span class="chip conf">confirmed · Ana</span>':'<span class="chip unk">unknown</span>';
+  return `<div class="quote">“doors keep reopening, D17”<small>Caller’s words, stored verbatim</small></div>
+  <div class="facts">${fact('Asset','B002','<span class="chip obs">observed</span>')}${fact('Serial','SN-48213','<span class="chip obs">observed</span>')}
+  ${fact('Model',s.model?'Model '+s.model:'—',mc)}${fact('Revision',s.rev?'rev '+s.rev:'—',rc)}</div>
+  <div class="fact"><div class="k">Open hypothesis</div><div class="v">I1: door reopen fault behind D17 <span class="chip inf">inferred</span> <span class="muted" style="font-weight:400">pending check K1</span></div></div>`;
+}
+const chatHTML=s=>s.chat.length?`<div class="chat">${s.chat.map(m=>m.me?`<div class="msg me">${esc(m.text)}</div>`:`<div class="msg"><div class="kind ${m.kind}">${m.kind}</div>${m.html}</div>`).join('')}</div>`:'';
+function agentCase(s,extra=''){return hostScreen(s,caseFacts(s)+chatHTML(s)+extra)}
+function phone(s,inner,who='Teo'){
+  const r=s.run;
+  return `<div class="chrome"><span>Fieldwise mobile</span><span>Signed in: ${who} · demo identity</span></div><div class="phone-stage"><div class="phone">
+  <div class="phone-top"><span>${r?r.id:'no run'}</span><span>${r?`PB2 v${r.pinned} · ver ${r.version}`:''}</span></div><div class="phone-b">${inner}</div></div></div>`;
+}
+function stepCard(s,opts={}){
+  const r=s.run,order=['K1','K2','V1'],i=order.indexOf(r.current);
+  let h=`<div class="progress">${order.map((k,j)=>`<span class="${(i<0||j<=i)?'on':''}"></span>`).join('')}</div>
+  <div style="font-size:13px">C104 · B002 · Model B rev 2 <span class="chip conf">confirmed</span></div>
+  <div style="font-size:13px" class="muted">Hypothesis I1 open · Caller: “doors keep reopening, D17”</div>`;
+  if(r.history.length) h+=`<div style="font-size:13px">Done: ${r.history.map(x=>`${x.step} ${LBL[x.answer]}`).join(' → ')}</div>`;
+  if(opts.top) h+=opts.top;
+  if(r.status==='paused') return h+`<div class="callout warn"><b>Paused for review.</b> ${esc(opts.pauseWhy||'The procedure behind this run was withdrawn.')} No further instructions are shown.</div>`;
+  const n=NODES[r.current];
+  if(n){
+    h+=`<div class="step-id">Step ${r.current}</div><div class="step-prompt">${esc(n.prompt)}</div>
+    ${n.cite?`<div>Evidence: ${cite(n.cite)}</div>`:'<div class="muted" style="font-size:13px">Verification step</div>'}
+    <div class="answers">${Object.keys(n.answers).map(a=>`<button data-ans="${a}" class="${opts.doAns===a?'do':''}">${LBL[a]}</button>`).join('')}</div>`;
+  } else if(r.current==='R'){
+    h+=`<div class="callout ok"><b>Service restored.</b> Record what you did and how you verified it.</div>
+    <label class="muted" style="font-size:12px" for="act">Action taken</label><input type="text" id="act" value="Recorded indicator and self-test per PB2; no parts replaced.">
+    <label class="muted" style="font-size:12px" for="vn">Verification note</label><input type="text" id="vn" value="Doors cycled 10 times in simulator; no reopen; D17 cleared.">
+    <div class="row" style="font-size:13px"><span class="muted">Was step K1 helpful?</span><button>Yes</button><button>No</button></div>`;
+  } else if(r.current==='done'){
+    h+=`<div class="callout ok"><b>Outcome recorded.</b> Ana reviews the host update next.</div>`;
+  } else if(TERM[r.current]){
+    const t=TERM[r.current];
+    h+=`<div class="callout warn"><b>${esc(t.text)}</b><br>Open question: ${esc(t.q)}</div><div class="muted" style="font-size:13px">Attempted steps and evidence travel with the escalation.</div>`;
+  }
+  return h;
+}
+function summary(s){
+  const r=s.run,o=s.outcome;
+  return `Case C104 · asset B002 · Model B rev 2 (confirmed by Ana)
+Caller: “doors keep reopening, D17”
+Procedure: PB2 v${r.pinned}, run ${r.id}
+Attempted steps:
+${r.history.map(x=>`  ${x.step}: ${LBL[x.answer]}${x.cite?` (${loc(x.cite)})`:''}`).join('\n')}
+Outcome: ${o.kind==='resolved'?'Resolved, verified by Teo':'Escalated — '+o.text.replace(/^Escalation \w+: /,'')}
+${o.kind==='resolved'?`Action: ${o.action}\nVerification: ${o.note}`:`Open question: ${o.q}`}`;
+}
+function closeScreen(s){
+  const d=s.delivery;
+  let h=`<div class="callout ${s.outcome.kind==='resolved'?'ok':'warn'}"><b>${s.outcome.kind==='resolved'?'Resolved and verified by Teo':'Escalated by Teo'}</b></div>
+  <h3>Host update preview</h3><div class="preview">${esc(summary(s))}</div>`;
+  if(!s.approved) h+=`<div class="row"><button class="primary do" data-do>Approve and send to host</button><span class="muted" style="font-size:13px">Nothing is written to the host until you approve.</span></div>`;
+  else h+=`<div class="row"><span class="mono">DLV-C104-1</span><span class="chip ${d.status==='delivered'?'obs':(d.status==='failed'?'bad':'unk')}">${d.status}</span><span class="muted" style="font-size:13px">attempts: ${d.attempts}</span></div>`;
+  return h;
+}
+function auditTable(s,limit){
+  const rows=s.audit.slice(-limit);
+  return `<div class="tbl"><table><thead><tr><th>#</th><th>Who</th><th>What was recorded</th></tr></thead><tbody>${rows.map(a=>`<tr><td class="mono">${a.n}</td><td><b>${a.actor}</b></td><td>${esc(a.text)}</td></tr>`).join('')}</tbody></table></div>`;
+}
+function graph(s,opts={}){
+  const taken=new Set((s.run?s.run.history:[]).map(x=>x.step+'>'+NODES[x.step].answers[x.answer]));
+  const P={K1:[70,60],K2:[230,60],V1:[390,60],R:[540,60],E1:[230,170],E2:[390,170],E3:[540,170]};
+  const E=[['K1','K2','green'],['K1','E1','amber',.45],['K1','E2','unreadable',.78],['K2','V1','pass'],['K2','E1','fail'],['K2','E2','unknown'],['V1','R','yes'],['V1','E3','no/unknown']];
+  if(opts.bad) E.push(['V1','K9','retry']);
+  const col=k=>k==='R'?'var(--ok)':(k[0]==='E'?'var(--signal)':(k==='K9'||k==='K3'?'var(--bad)':'var(--accent)'));
+  if(opts.bad){P.K9=[540,-999];P.K3=[70,170]}
+  let o=`<svg viewBox="0 0 610 215" role="img" aria-label="Pathway branches"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--muted)"/></marker></defs>`;
+  E.forEach(([a,b,l,t=.5])=>{if(b==='K9')return;const[x1,y1]=P[a],[x2,y2]=P[b];const on=taken.has(a+'>'+b);
+    const sx=x1+(x2>x1?40:0),sy=y1+(y2>y1?18:0),ex=x2-(x2>x1?40:0),ey=y2-(y2>y1?18:0);
+    const vert=sx===ex,lx=vert?sx+8:sx+(ex-sx)*t+(y2>y1?10:0),ly=sy+(ey-sy)*t-(vert?0:6);
+    o+=`<line x1="${sx}" y1="${sy}" x2="${ex}" y2="${ey}" stroke="${on?'var(--accent)':'var(--line)'}" stroke-width="${on?2.5:1.4}" marker-end="url(#ah)"/><text x="${lx}" y="${ly}" font-size="11" fill="var(--muted)" font-family="IBM Plex Mono,monospace" text-anchor="${vert?'start':'middle'}">${l}</text>`});
+  Object.entries(P).forEach(([k,[x,y]])=>{if(y<0)return;const cur=s.run&&s.run.current===k&&!opts.bad;
+    o+=`<rect x="${x-40}" y="${y-18}" width="80" height="36" rx="7" fill="${cur?'var(--accent-soft)':'var(--surface)'}" stroke="${col(k)}" stroke-width="${cur||k==='K3'?2.5:1.4}" ${k==='K3'?'stroke-dasharray="5 4"':''}/><text x="${x}" y="${y+5}" text-anchor="middle" font-size="13" font-weight="600" fill="var(--ink)" font-family="Archivo,sans-serif">${k}</text>`});
+  return `<div class="graph-wrap">${o}</svg></div>`;
+}
+function appScreen(title,who,inner){return `<div class="chrome"><span>Fieldwise · ${title}</span><span>Signed in: ${who} · demo identity</span></div><div class="embed">${inner}</div>`}
+
+/* ---------- scenarios ---------- */
+const doBtn=(label,cls='primary')=>`<button class="${cls} do" data-do>${label}</button>`;
+const ask=(label)=>`<div class="row"><input type="text" value="${esc(label)}" aria-label="Question" readonly style="flex:1 1 200px;min-width:0">${doBtn('Ask')}</div>`;
+
+const SCEN={
+resolve:{name:'Resolution',sub:'C104 from call to verified fix',steps:[
+ {who:'Ana',title:'A caller reports D17',why:'Ana opens case C104 inside her service desk. Fieldwise shows the caller’s exact words and what the asset record actually proves: the serial is known, but model and revision are not.',todo:'Ask Fieldwise what D17 means.',
+  screen:s=>agentCase(s,ask('What does D17 mean here?')),act:s=>askD17(s,'What does D17 mean here?')},
+ {who:'Ana',title:'Fieldwise refuses to guess',why:'Two fictional elevator models share code D17 and need different fixes. With model and revision unknown, Fieldwise asks for them and returns zero repair steps. It never infers the model from the serial.',todo:'Confirm Model B, revision 2 (Ana checked the nameplate photo with the caller).',
+  screen:s=>agentCase(s,`<div class="callout warn"><b>Confirm applicability</b><div class="row" style="margin-top:6px"><select aria-label="Model" disabled><option>Model B</option></select><select aria-label="Revision" disabled><option>rev 2</option></select>${doBtn('Confirm')}</div></div>`),act:s=>confirm(s,'B','2')},
+ {who:'Ana',title:'The model is now a recorded fact',why:'Ana’s confirmation is saved as her own observation, separate from anything the system suggested. Asking again now gives a model-specific answer.',todo:'Ask about D17 again.',
+  screen:s=>agentCase(s,ask('What does D17 mean here?')),act:s=>askD17(s,'What does D17 mean here?')},
+ {who:'Ana',title:'A cited answer and an approved procedure',why:'The answer cites manual MB2 page 14. History shows 1 verified recovery in 2 matching cases, with the denominator. The Model A instruction and the superseded MB1 page are left out. Click the citation or H1 to inspect them.',todo:'Start approved procedure PB2 v1 and hand C104 to Teo.',
+  screen:s=>agentCase(s,`<div class="row">${doBtn('Start PB2 v1 and assign to Teo')}</div>`),act:s=>startRun(s)},
+ {who:'Teo',title:'Teo picks up the same case on a phone',why:'Teo sees the confirmed facts, the open hypothesis, the current step and its evidence. He does not repeat the intake. Only the answers the procedure allows are offered.',todo:'Tap Green: the indicator reads green.',
+  screen:s=>phone(s,stepCard(s,{doAns:'green'})),act:s=>tap(s,'green')},
+ {who:'Teo',title:'Every tap is saved immediately',why:'The choice was committed with a new run version. If Teo’s browser closes, the same run, version and step come back.',todo:'Simulate closing and reopening the phone.',
+  screen:s=>phone(s,stepCard(s,{top:s.refreshed?`<div class="callout ok"><b>Restored from server:</b> RUN-7Q2F, PB2 v1, version ${s.run.version}, step ${s.run.current}.</div>`:''})+`<div class="row" style="justify-content:center;padding:0 0 16px">${doBtn('Close and reopen phone','')}</div>`),act:s=>{s.refreshed=true;log(s,'Teo','Reopened the phone: same run, version and step restored.')}},
+ {who:'Teo',title:'Run the self-test',why:'Each branch comes from the stored procedure, not from chat. Pass moves to verification; fail or unknown would escalate.',todo:'Tap Pass.',
+  screen:s=>phone(s,stepCard(s,{doAns:'pass'})),act:s=>tap(s,'pass')},
+ {who:'Teo',title:'Verify before closing',why:'A case can only close as resolved after the technician confirms service was restored and says how.',todo:'Tap “Yes, restored”.',
+  screen:s=>phone(s,stepCard(s,{doAns:'yes'})),act:s=>tap(s,'yes')},
+ {who:'Teo',title:'Record the outcome',why:'Teo records the action taken, a verification note and quick feedback on the step. Reviewers use this feedback later.',todo:'Save the verified outcome.',
+  screen:s=>phone(s,stepCard(s))+`<div class="row" style="justify-content:center;padding:0 0 16px">${doBtn('Save outcome')}</div>`,act:s=>verify(s)},
+ {who:'Ana',title:'Ana approves the host update',why:'Ana sees exactly what will be written back to the service desk: steps with citations, outcome and verification. Nothing goes out until she approves.',todo:'Approve the update.',
+  screen:s=>hostScreen(s,closeScreen(s)),act:s=>approve(s)},
+ {who:'Ana',title:'The host is down',why:'The first send fails because of a simulated outage. The outcome and evidence stay safe in Fieldwise’s outbox.',todo:'Send to host (it will fail).',
+  screen:s=>hostScreen(s,closeScreen(s)+(s.delivery.status==='failed'?'<div class="callout bad"><b>Host unavailable.</b> Kept in the outbox for retry.</div>':`<div class="row">${doBtn('Send to host','')}</div>`)),act:s=>sendFail(s)},
+ {who:'Ana',title:'Retry delivers exactly once',why:'The retry delivers the summary with a receipt. A second retry returns the same receipt instead of a duplicate entry on the host.',todo:'Retry twice.',
+  screen:s=>hostScreen(s,closeScreen(s)+(s.delivery.status==='delivered'?`<div class="callout ok"><b>Mock host received 1 summary.</b> Receipt <span class="mono">RCPT-0091</span>. The second retry returned the same receipt.</div>`:`<div class="row">${doBtn('Retry twice','')}</div>`)),act:s=>{sendOk(s);sendAgain(s)}},
+ {who:'Ren',title:'Ren traces how the case got here',why:'The reviewer sees the path taken through PB2 v1 and every recorded action in order: evidence opened, steps answered, feedback and delivery.',todo:null,
+  screen:s=>appScreen('Review','Ren',`<h3>PB2 v1 · path taken on C104</h3>${graph(s)}<h3>Ordered trace</h3>${auditTable(s,40)}`)}
+]},
+escalate:{name:'Escalation',sub:'When the check fails',start:s=>{confirm(s,'B','2');askD17(s,'What does D17 mean here?');startRun(s)},steps:[
+ {who:'Teo',title:'The indicator reads amber',why:'Same case, same procedure. This time the first check shows a simulated anomaly. PB2 v1 says amber goes to escalation E1, not to another repair step.',todo:'Tap Amber.',
+  screen:s=>phone(s,stepCard(s,{doAns:'amber'})),act:s=>tap(s,'amber')},
+ {who:'Teo',title:'An escalation, not a guess',why:'Fieldwise stops giving instructions. The escalation carries what was tried, the evidence and one open question for the next expert.',todo:null,
+  screen:s=>phone(s,stepCard(s))},
+ {who:'Ana',title:'Ana sends the escalation summary',why:'The host gets an unresolved case with attempted steps and an open question, so the next person starts where Teo stopped.',todo:'Approve and send.',
+  screen:s=>hostScreen(s,closeScreen(s)+(s.delivery&&s.delivery.status==='delivered'?'<div class="callout ok"><b>Delivered once.</b> Receipt RCPT-0092.</div>':'')),act:s=>{approve(s);s.delivery.attempts=1;s.delivery.status='delivered';s.delivery.receipt='RCPT-0092';log(s,'Mock host','Received escalation summary once. Receipt RCPT-0092.')}},
+ {who:'Ana',title:'C105 keeps its own history',why:'Switching to another case clears the conversation. C105 has no observations and none of C104’s answers.',todo:'Switch to C105.',
+  screen:s=>s.caseSel==='C105'?hostScreen(s,`<div class="quote">“car stops between floors”<small>Caller’s words, stored verbatim</small></div><div class="facts">${fact('Model','—','<span class="chip unk">unknown</span>')}${fact('Revision','—','<span class="chip unk">unknown</span>')}</div><div class="callout"><b>No conversation yet on C105.</b> Nothing from C104 carries over.</div>`):agentCase(s,`<div class="row">${doBtn('Switch to C105','')}</div>`),act:s=>{s.caseSel='C105';log(s,'Ana','Switched to C105. Conversation shows C105 only.')}}
+]},
+guard:{name:'Guardrails',sub:'What Fieldwise blocks',start:s=>{confirm(s,'B','2');askD17(s,'What does D17 mean here?');startRun(s)},steps:[
+ {who:'Ana',title:'Only the assigned technician can answer a step',why:'Ana and Mia (a second technician not on this case) both try to submit step K1. The server checks role and assignment on every write.',todo:'Try as Ana, then as Mia.',
+  screen:s=>phone(s,stepCard(s,{top:s.tried.role?`<div class="callout bad"><span class="http">403</span> Ana is not the assigned technician.<br><span class="http">403</span> Mia is not assigned to C104.<br>Step K1 is unchanged.</div>`:''}),s.tried.role?'Ana, then Mia':'Ana')+(s.tried.role?'':`<div class="row" style="justify-content:center;padding:0 0 16px">${doBtn('Submit K1 as Ana, then as Mia','')}</div>`),act:s=>{s.tried.role=true;log(s,'Ana','Tried to submit K1 → 403. Step unchanged.');log(s,'Mia','Tried to submit K1 → 403. Step unchanged.')}},
+ {who:'Teo',title:'Chat can explain, never choose',why:'Teo types “just pick green for me.” The assistant explains the step and cites the manual, but only a tapped answer can move the procedure.',todo:'Send the chat message.',
+  screen:s=>phone(s,stepCard(s,{top:s.tried.chat?`<div class="chat"><div class="msg me">just pick green for me</div><div class="msg"><div class="kind note">explain only</div>Read indicator B and tap what you see: Green, Amber or Unreadable. I can’t choose a branch for you. ${cite('MB2-p14')}</div></div>`:''}))+(s.tried.chat?'':`<div class="row" style="justify-content:center;padding:0 0 16px">${doBtn('Send “just pick green for me”','')}</div>`),act:s=>{s.tried.chat=true;log(s,'Teo','Chat “just pick green for me” → explained, no branch chosen.')}},
+ {who:'Teo',title:'A double tap counts once',why:'Teo’s phone sends Green twice with the same retry key. The second request returns the original response, and only one choice is recorded.',todo:'Send the same tap twice.',
+  screen:s=>phone(s,stepCard(s,{top:s.tried.dup?`<div class="callout ok"><b>1st:</b> version 2, next K2<br><b>2nd (same key demo-1):</b> same response, nothing new recorded</div>`:''}))+(s.tried.dup?'':`<div class="row" style="justify-content:center;padding:0 0 16px">${doBtn('Tap Green twice','')}</div>`),act:s=>{tap(s,'green');s.tried.dup=true;log(s,'Teo','Replayed retry key demo-1 → original response returned.')}},
+ {who:'Teo',title:'Two stale writes, one winner',why:'Two tabs both submit K2 at version 2. The first commits; the second gets a conflict and must reload. Reusing a retry key with a different answer is also a conflict.',todo:'Submit from both tabs.',
+  screen:s=>phone(s,stepCard(s,{top:s.tried.race?`<div class="callout warn">Tab A: Pass at version 2 → committed, version 3<br>Tab B: Fail at version 2 → <span class="http">409</span> stale version</div>`:''}))+(s.tried.race?'':`<div class="row" style="justify-content:center;padding:0 0 16px">${doBtn('Submit K2 from two tabs','')}</div>`),act:s=>{tap(s,'pass');s.tried.race=true;log(s,'Teo','Second tab submitted K2 at stale version 2 → 409.')}},
+ {who:'Ana',title:'A corrected revision pauses the run',why:'Ana learns the unit is actually revision 1. Correcting a confirmed fact pauses the active run for review and requires a fresh, applicable run.',todo:'Correct the revision to rev 1.',
+  screen:s=>s.tried.fix?phone(s,stepCard(s,{pauseWhy:'Ana corrected the confirmed revision, so PB2 v1 may no longer apply.'})):agentCase(s,`<div class="callout warn">Correct a confirmed fact<div class="row" style="margin-top:6px"><select aria-label="Revision" disabled><option>rev 1</option></select>${doBtn('Save correction')}</div></div>`),act:s=>{s.tried.fix=true;s.rev='1';s.run.status='paused';log(s,'Ana','Corrected revision to 1. RUN-7Q2F paused for review.')}},
+ {who:'Ana',title:'Other tenants stay invisible',why:'North users try a South case URL and search for a South-only manual token. They get a plain not-found and zero results, with no title leaked.',todo:'Try both.',
+  screen:s=>hostScreen(s,s.tried.tenant?`<div class="callout bad"><span class="mono">GET /cases/S-301</span> → <span class="http">404</span> Not found</div><div class="callout bad"><span class="mono">search “SOUTH-ONLY-41”</span> → 0 results</div>`:`<div class="row">${doBtn('Open /cases/S-301 and search SOUTH-ONLY-41','')}</div>`),act:s=>{s.tried.tenant=true;log(s,'Ana','Opened South case S-301 → 404. Searched SOUTH-ONLY-41 → 0 results.')}},
+ {who:'Ana',title:'No closure without verification',why:'Ana tries to close C104 before any outcome is recorded. Fieldwise refuses.',todo:'Try to close C104.',
+  screen:s=>hostScreen(s,s.tried.early?`<div class="callout bad"><span class="http">409</span> C104 has no verified outcome. Closure refused.</div>`:`<div class="row">${doBtn('Close C104 now','')}</div>`),act:s=>{s.tried.early=true;log(s,'Ana','Tried to close C104 before verification → refused.')}},
+ {who:'Ren',title:'Every blocked attempt is on record',why:'Blocked actions are audited too, so a reviewer can see what was tried and refused.',todo:null,
+  screen:s=>appScreen('Review','Ren',`<h3>Ordered trace</h3>${auditTable(s,40)}`)}
+]},
+knowledge:{name:'Knowledge and review',sub:'Import, author, publish, withdraw',start:s=>{confirm(s,'B','2');askD17(s,'What does D17 mean here?');startRun(s);tap(s,'green')},steps:[
+ {who:'Ari',title:'Ari imports the manuals',why:'Ari uploads a JSON manifest of manual passages. Valid records are kept, and a malformed one is rejected with a reason.',todo:'Import manifest.json.',
+  screen:s=>appScreen('Knowledge','Ari',s.imported?importTable(s):`<div class="row">${doBtn('Import manifest.json')}</div><div class="muted" style="font-size:13px">5 records: MA1 p8, MB2 p14, MB2 p15, MB1 p9 (superseded), and one with no page locator.</div>`),act:s=>{s.imported=1;log(s,'Ari','Imported manifest.json: 4 accepted, 1 rejected (missing locator).')}},
+ {who:'Ari',title:'Importing again changes nothing',why:'The same file has the same checksum, so counts stay stable. No duplicates.',todo:'Import the same file again.',
+  screen:s=>appScreen('Knowledge','Ari',importTable(s)+(s.reimported?'<div class="callout ok"><b>Same checksum.</b> 0 new records. Counts unchanged: 4 accepted, 1 rejected.</div>':`<div class="row">${doBtn('Import manifest.json again','')}</div>`)),act:s=>{s.reimported=true;log(s,'Ari','Re-imported manifest.json: identical checksum, counts unchanged.')}},
+ {who:'Ari',title:'Validation catches a broken draft',why:'Ari drafts PB2 v2. The validator finds an unreachable step K3 and an answer that routes to a step that does not exist.',todo:'Validate draft v2.',
+  screen:s=>appScreen('Pathway editor','Ari',`<h3>PB2 v2 (draft)</h3>${graph(s,{bad:!s.draftFixed})}`+(s.draftChecked?(s.draftFixed?'<div class="callout ok"><b>Valid.</b> Every answer has one edge, every node is reachable, all paths end in a terminal, no cycles.</div>':'<div class="callout bad"><b>2 errors</b><br>K3 is unreachable from K1.<br>V1 answer “retry” routes to missing step K9.</div>'):`<div class="row">${doBtn('Validate draft')}</div>`)),act:s=>{s.draftChecked=true;log(s,'Ari','Validated PB2 v2 draft → 2 errors (unreachable K3, missing K9).')}},
+ {who:'Ari',title:'Fix it, but no self-approval',why:'Ari removes K3 and the bad edge, so the draft passes. Ari then tries to publish it and is blocked: a different person must review and publish.',todo:'Fix the draft and try to publish.',
+  screen:s=>appScreen('Pathway editor','Ari',`<h3>PB2 v2 (draft)</h3>${graph(s,{bad:!s.draftFixed})}`+(s.selfBlocked?'<div class="callout ok"><b>Valid.</b> Ready for review.</div><div class="callout bad"><span class="http">403</span> Authors cannot publish their own pathway. Sent to Ren for review.</div>':`<div class="row">${doBtn('Fix and publish')}</div>`)),act:s=>{s.draftFixed=true;s.selfBlocked=true;log(s,'Ari','Fixed draft; validation passed. Tried to publish own draft → 403, sent for review.')}},
+ {who:'Ren',title:'Publish v2 while v1 is running',why:'Ren previews the branches and publishes PB2 v2. Teo’s run already in progress stays pinned to v1. A new run would use v2.',todo:'Publish PB2 v2.',
+  screen:s=>appScreen('Review','Ren',`<table><thead><tr><th>Version</th><th>Status</th><th>Runs</th></tr></thead><tbody><tr><td>PB2 v1</td><td><span class="chip ${s.v1==='published'?'obs':'unk'}">${s.v1}</span></td><td>RUN-7Q2F (Teo, at K2)</td></tr><tr><td>PB2 v2</td><td><span class="chip ${s.v2?'obs':'unk'}">${s.v2?'published':'in review'}</span></td><td>${s.v2?'New runs start here':'—'}</td></tr></tbody></table>`+(s.v2?'<div class="callout ok">RUN-7Q2F stays pinned to v1. Published versions never change.</div>':`<div class="row">${doBtn('Publish PB2 v2')}</div>`)),act:s=>{s.v2=true;log(s,'Ren','Published PB2 v2. RUN-7Q2F stays pinned to v1.')}},
+ {who:'Ren',title:'Withdraw v1',why:'Ren withdraws PB2 v1. New runs on v1 are blocked, and Teo’s active run pauses before it shows another instruction.',todo:'Withdraw PB2 v1.',
+  screen:s=>s.v1==='withdrawn'?phone(s,stepCard(s,{pauseWhy:'Ren withdrew PB2 v1.'})):appScreen('Review','Ren',`<div class="row">${doBtn('Withdraw PB2 v1')}</div>`),act:s=>{s.v1='withdrawn';s.run.status='paused';log(s,'Ren','Withdrew PB2 v1. RUN-7Q2F paused before step K2.')}},
+ {who:'Ren',title:'Withdraw the manual itself',why:'Ren withdraws manual MB2. Guidance that depends on it disappears from answers and cannot run. Past audit records stay.',todo:'Withdraw MB2, then let Ana ask again.',
+  screen:s=>s.mb2==='withdrawn'?agentCase(s):appScreen('Review','Ren',`<div class="row">${doBtn('Withdraw MB2')}</div>`),act:s=>{s.mb2='withdrawn';log(s,'Ren','Withdrew manual MB2. Dependent guidance invalidated.');s.chat=[];askD17(s,'What does D17 mean here?')}},
+ {who:'Ren',title:'Step feedback and the full trace',why:'Ren sees every import, validation, publication and withdrawal in order, next to the run it affected.',todo:null,
+  screen:s=>appScreen('Review','Ren',`<h3>Ordered trace</h3>${auditTable(s,40)}`)}
+]},
+hier:{name:'Hierarchy and templates',sub:'Where guidance attaches',steps:[
+ {who:'Ari',title:'Equipment is a hierarchy',why:'Fault codes like D17 are defined once for the whole elevator family. Manuals and approved procedures attach lower down, to one model and revision. That is why D17 alone cannot pick a fix.',todo:'Select Model B · rev 2 to see what applies there.',
+  screen:s=>appScreen('Product hierarchy','Ari',`<div class="hgrid">${productTree(s)}${s.hsel?applies():'<div class="callout muted">Select a node to see what applies to it.</div>'}</div>`),act:s=>{s.hsel=true;log(s,'Ari','Viewed Model B rev 2: inherits D17 from family; own manual MB2; procedure PB2 v1.')}},
+ {who:'Ana',title:'Each real unit hangs off one product node',why:'B002 sits in an asset hierarchy: site, elevator bank, car. Until a person links it to a model and revision, Fieldwise treats its product node as unknown and offers no model-specific steps.',todo:'Link B002 to Model B rev 2 (Ana confirms with the caller).',
+  screen:s=>appScreen('Asset hierarchy','Ana',`<div class="hgrid">${assetTree(s)}<div class="callout ${s.linked?'ok':'warn'}">${s.linked?'<b>B002 → Elevators › Model B › rev 2</b><br>Confirmed by Ana. B002 now inherits D17 and PB2 v1 from that node. B007 stays unlinked.':'<b>B002 product node: unknown</b><br>Serial SN-48213 is known, but serials are never used to guess the model.'}</div></div>`+(s.linked?'':`<div class="row">${doBtn('Confirm Model B rev 2 for B002')}</div>`)),act:s=>{s.linked=true;log(s,'Ana','Linked asset B002 to product node Model B rev 2 (confirmed observation).')}},
+ {who:'Ari',title:'One template, filled per revision',why:'Ari keeps one procedure template at family level: indicator check, self-test, verify. Applying it to Model B rev 2 fills each slot with that revision’s own cited manual page.',todo:'Apply the template to Model B rev 2.',
+  screen:s=>appScreen('Templates','Ari',templateTable(s,'B'))+(s.tplB?'':`<div class="embed" style="padding-top:0"><div class="row">${doBtn('Apply to Model B rev 2')}</div></div>`),act:s=>{s.tplB=true;log(s,'Ari','Applied template T-IND to Model B rev 2 → draft PB2 v2, all 3 slots cited.')}},
+ {who:'Ari',title:'A template cannot invent evidence',why:'Applying the same template to Model A rev 1 fails: manual MA1 has no self-test page, so that slot has no citation. Fieldwise blocks the draft instead of filling the gap.',todo:'Apply the template to Model A rev 1.',
+  screen:s=>appScreen('Templates','Ari',templateTable(s,'A'))+(s.tplA?'':`<div class="embed" style="padding-top:0"><div class="row">${doBtn('Apply to Model A rev 1')}</div></div>`),act:s=>{s.tplA=true;log(s,'Ari','Applied template T-IND to Model A rev 1 → blocked: slot “self-test” has no cited passage.')}},
+ {who:'Ren',title:'See where a template is used',why:'Ren sees every procedure built from the template and its state. Changing the template creates new drafts for review on each model. Nothing republishes on its own.',todo:null,
+  screen:s=>appScreen('Review','Ren',`<h3>Template T-IND · Indicator, self-test, verify</h3><div class="tbl"><table><thead><tr><th>Product node</th><th>Procedure</th><th>Slots cited</th><th>State</th></tr></thead><tbody>
+   <tr><td>Model B › rev 2</td><td>PB2 v1</td><td>3 of 3</td><td><span class="chip obs">published</span></td></tr>
+   <tr><td>Model B › rev 2</td><td>PB2 v2</td><td>3 of 3</td><td><span class="chip unk">in review</span></td></tr>
+   <tr><td>Model A › rev 1</td><td>PA2 draft</td><td>2 of 3</td><td><span class="chip bad">blocked</span></td></tr>
+   <tr><td>Model B › rev 1</td><td>none</td><td>—</td><td><span class="chip inf">manual superseded</span></td></tr></tbody></table></div>`)}
+]}
+};
+function node(label,meta,opts={}){return `<li><div class="hnode ${opts.sel?'sel':''} ${opts.dim?'dim':''}"><b>${label}</b>${meta?`<span>${meta}</span>`:''}${opts.btn?`<button class="do" data-do style="margin-top:6px;align-self:flex-start">Select</button>`:''}</div>${opts.kids?`<ul>${opts.kids}</ul>`:''}</li>`}
+function productTree(s){
+  return `<ul class="tree">${node('Elevators (family)','Fault codes: D17 (alias D-17) · Template T-IND',{kids:
+   node('Model A','',{kids:node('rev 1','MA1 manual · PA1 v1 procedure')})+
+   node('Model B','',{kids:node('rev 1','MB1 manual (superseded)',{dim:true})+node('rev 2','MB2 manual · PB2 v1 procedure',{sel:s.hsel,btn:!s.hsel})})})}</ul>`;
+}
+function applies(){return `<div class="callout"><b>Applies to Model B · rev 2</b><ul style="margin:6px 0 0;padding-left:18px">
+  <li>D17 and D-17, inherited from the family</li><li>Manual MB2, pages 14 and 15 ${cite('MB2-p14')}</li><li>Approved procedure PB2 v1</li></ul>
+  <div class="muted" style="font-size:13px;margin-top:6px">Not inherited: MA1 and PA1 (sibling model), MB1 (superseded revision).</div></div>`}
+function assetTree(s){
+  return `<ul class="tree">${node('Tenant North','',{kids:node('Harbor Tower (site)','',{kids:node('Elevator bank 1','',{kids:
+   node('Car 2 · B002',s.linked?'→ Model B › rev 2':'product node unknown',{sel:true})+node('Car 3 · B007','product node unknown',{dim:true})})})})}</ul>`;
+}
+function templateTable(s,m){
+  const B=m==='B',done=B?s.tplB:s.tplA;
+  const rows=B?[['Indicator check','MB2 p14',true],['Self-test','MB2 p15',true],['Verify restored','built-in question',true]]
+              :[['Indicator check','MA1 p8',true],['Self-test','no passage in MA1',false],['Verify restored','built-in question',true]];
+  return `<div class="row" style="justify-content:space-between"><h3>T-IND · Indicator, self-test, verify</h3><span class="mono muted">defined at: Elevators (family)</span></div>
+  <div class="tbl"><table><thead><tr><th>Slot</th><th>Model ${m} rev ${B?2:1} source</th><th>Status</th></tr></thead><tbody>${rows.map(([a,b,ok])=>`<tr><td>${a}</td><td class="mono">${done?b:'—'}</td><td>${done?(ok?'<span class="chip obs">cited</span>':'<span class="chip bad">unbound</span>'):'<span class="chip inf">not applied</span>'}</td></tr>`).join('')}</tbody></table></div>
+  ${done?(B?'<div class="callout ok"><b>Draft PB2 v2 created.</b> All slots cite Model B rev 2 pages. Sent to Ren for review.</div>':'<div class="callout bad"><b>Draft blocked.</b> Slot “Self-test” has no cited passage for Model A rev 1. An author must add a source or remove the slot.</div>'):''}`;
+}
+function importTable(s){
+  return `<div class="tbl"><table><thead><tr><th>Record</th><th>Applies to</th><th>Result</th></tr></thead><tbody>
+  <tr><td class="mono">MA1 p8</td><td>Model A rev 1</td><td><span class="chip obs">accepted</span></td></tr>
+  <tr><td class="mono">MB2 p14</td><td>Model B rev 2</td><td><span class="chip obs">accepted</span></td></tr>
+  <tr><td class="mono">MB2 p15</td><td>Model B rev 2</td><td><span class="chip obs">accepted</span></td></tr>
+  <tr><td class="mono">MB1 p9</td><td>Model B rev 1</td><td><span class="chip obs">accepted</span> <span class="chip unk">superseded</span></td></tr>
+  <tr><td class="mono">MB2 (no page)</td><td>Model B rev 2</td><td><span class="chip bad">rejected</span> missing page locator</td></tr></tbody></table></div>`;
+}
+
+/* ---------- engine ---------- */
+let cur={scen:'resolve',i:0,done:false};
+function build(){ts=0;const sc=SCEN[cur.scen];const s=init();if(sc.start)sc.start(s);const mark=s.audit.length;
+  for(let j=0;j<cur.i;j++){const st=sc.steps[j];if(st.act)st.act(s)}
+  const before=s.audit.length;if(cur.done&&sc.steps[cur.i].act)sc.steps[cur.i].act(s);
+  return {s,newLines:s.audit.slice(before),mark}}
+function render(){
+  const sc=SCEN[cur.scen],st=sc.steps[cur.i],{s,newLines}=build();
+  $('tabs').innerHTML=Object.entries(SCEN).map(([k,v])=>`<button role="tab" aria-selected="${k===cur.scen}" data-scen="${k}"><b>${v.name}</b><span>${v.sub}</span></button>`).join('');
+  const needs=!!st.act&&!cur.done;
+  $('narr').innerHTML=`<div class="count">${sc.name} · step ${cur.i+1} of ${sc.steps.length}</div>
+   <div class="dots">${sc.steps.map((x,j)=>`<button data-jump="${j}" style="--dc:var(--p-${x.who.toLowerCase()})" class="${j<=cur.i?'on':''}" title="Step ${j+1}: ${esc(x.title)} (${x.who})" aria-label="Go to step ${j+1}: ${esc(x.title)}"></button>`).join('')}</div>
+   <div class="row" style="font-size:12.5px">${[...new Set(sc.steps.map(x=>x.who))].map(w=>`<button class="link" style="color:var(--p-${w.toLowerCase()})" data-jump="${sc.steps.findIndex(x=>x.who===w)}">${w==='Teo'?'Jump to Teo’s phone':'Jump to '+w}</button>`).join(' · ')}</div>
+   <div class="persona"><div class="av">${st.who[0]}</div><div><b>You are ${st.who}</b><small>${PEOPLE[st.who]} · demo identity</small></div></div>
+   <h2>${st.title}</h2><p class="why">${st.why}</p>
+   ${needs?`<p class="todo">Do this: ${st.todo} <span class="muted" style="font-weight:400">(the highlighted button)</span></p>`:''}
+   ${cur.done&&newLines.length?`<div class="rec"><b>What Fieldwise recorded</b><ul>${newLines.map(l=>`<li><b>${l.actor}:</b> ${esc(l.text)}</li>`).join('')}</ul></div>`:''}
+   <p class="callout warn" id="hint" hidden style="font-size:14px"></p>
+   <div class="navrow"><button id="back" ${cur.i===0?'disabled':''}>Back</button>
+   ${cur.i<sc.steps.length-1?`<button id="next" class="primary" ${needs?'disabled':''}>Next</button>`:`<button id="restart">Start over</button>`}</div>`;
+  const pc=`var(--p-${st.who.toLowerCase()})`;$('screen').style.setProperty('--pc',pc);$('narr').style.setProperty('--pc',pc);
+  $('screen').innerHTML=st.screen(s);
+  if(cur.done) $('screen').querySelectorAll('[data-do]').forEach(b=>{b.classList.remove('do');b.disabled=true});
+}
+const $=id=>document.getElementById(id);
+function go(scen,i){cur={scen,i,done:false};render();window.scrollTo({top:0,behavior:'auto'})}
+document.addEventListener('click',e=>{
+  const t=e.target.closest('button'); if(!t) return;
+  if(t.dataset.cite){const p=PASSAGES[t.dataset.cite];$('dr-h').textContent='Cited passage';
+    $('drBody').innerHTML=`<div class="sheet"><div class="pg"><span>${p.src} · ${esc(p.title)}</span><span>rev ${p.rev} · page ${p.page}</span></div><p>${esc(p.text)}</p></div><div class="facts">${fact('Applies to','Model '+p.model+' rev '+p.rev)}${fact('Status',p.status)}</div><div class="muted" style="font-size:13px">Stored as source revision plus page locator. Fictional simulator manual.</div>`;
+    $('drawer').hidden=false;$('drClose').focus();return}
+  if(t.dataset.hist){const h=HISTORY[t.dataset.hist];$('dr-h').textContent='Historical case';
+    $('drBody').innerHTML=`<div class="sheet"><div class="pg"><span>${esc(h.title)}</span><span>outcome: ${h.outcome}</span></div><p>${esc(h.body)}</p></div>`;$('drawer').hidden=false;$('drClose').focus();return}
+  if(t.id==='drClose'){$('drawer').hidden=true;return}
+  if(t.dataset.scen) return go(t.dataset.scen,0);
+  if(t.dataset.jump!==undefined) return go(cur.scen,+t.dataset.jump);
+  if(t.id==='back') return go(cur.scen,cur.i-1);
+  if(t.id==='next') return go(cur.scen,cur.i+1);
+  if(t.id==='restart') return go(cur.scen,0);
+  const st=SCEN[cur.scen].steps[cur.i];
+  if(!cur.done&&st.act&&(t.dataset.do!==undefined||t.classList.contains('do'))){cur.done=true;render();const n=$('next');if(n)n.focus();return}
+  if(t.closest('#screen')&&!t.disabled){
+    const a=t.dataset.ans;
+    let msg='This walkthrough follows one path. Use the highlighted button, or pick another scenario above.';
+    if(a==='amber'||a==='fail') msg=`“${LBL[a]}” leads to escalation E1. See it in the Escalation scenario.`;
+    else if(a==='unreadable'||a==='unknown') msg=`“${LBL[a]}” leads to escalation E2, asking for a readable observation.`;
+    else if(a==='no') msg='“No” opens escalation E3: service not verified as restored.';
+    else if(cur.done) msg='Step done. Press Next to continue.';
+    const h=$('hint'); if(h){h.textContent=msg;h.hidden=false}
+  }
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')$('drawer').hidden=true});
+$('drawer').addEventListener('click',e=>{if(e.target.id==='drawer')$('drawer').hidden=true});
+render();
+</script>
+
+</body>
+</html>
