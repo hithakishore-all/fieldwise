@@ -1,0 +1,38 @@
+{
+  "records": [
+    {
+      "sourceId": "MC1",
+      "externalId": "north-manual-c-r1",
+      "title": "Model C service manual",
+      "model": "C",
+      "revision": "1",
+      "status": "current",
+      "passages": [
+        {"locator": "p4", "page": 4, "text": "Read indicator C in the simulator. Record green, amber or unreadable.", "faultCodes": ["D-17"], "topic": "indicator"},
+        {"locator": "p5", "page": 5, "text": "Run the C simulator self-test and record its result.", "faultCodes": ["D17"], "topic": "self-test"}
+      ]
+    },
+    {
+      "sourceId": "MB3",
+      "externalId": "north-manual-b-r3",
+      "title": "Model B service manual",
+      "model": "B",
+      "revision": "3",
+      "status": "current",
+      "passages": [
+        {"locator": "p11", "page": 11, "text": "Read indicator B3 in the simulator. Record green, amber or unreadable.", "faultCodes": ["D17"], "topic": "indicator"}
+      ]
+    },
+    {
+      "sourceId": "MB2-X",
+      "externalId": "north-manual-b-r2-scan",
+      "title": "Model B scan with no page numbers",
+      "model": "B",
+      "revision": "2",
+      "status": "current",
+      "passages": [
+        {"page": 0, "text": "Untitled scanned page."}
+      ]
+    }
+  ]
+}

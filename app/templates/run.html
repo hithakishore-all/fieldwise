@@ -1,0 +1,45 @@
+{% extends "base.html" %}{% block title %}{{ run.key }}{% endblock %}
+{% block content %}
+{% set mine = actor.role == 'technician' and actor.id == case.assigned_tech_id %}
+<div class="phone">
+  <div class="row small muted" style="justify-content:space-between"><span class="mono">{{ run.key }}</span><span class="mono">{{ run.pathway_version.pathway.key }} v{{ run.pathway_version.version }} · run version {{ run.version }}</span></div>
+  <div class="progress" aria-hidden="true">{% for k in order %}<span class="{{ 'on' if k in steps|map(attribute='step')|list or k == run.current_node }}"></span>{% endfor %}</div>
+  <div class="card">
+    <div class="small"><b>{{ case.key }}</b> · {{ case.asset.key }} · Model {{ case.model }} rev {{ case.revision }} <span class="chip confirmed">confirmed</span></div>
+    <div class="small muted">Caller: “{{ case.intake_text }}”{% for i in infs %} · Hypothesis {{ i.key }} {{ i.status }}{% endfor %}</div>
+    {% if steps %}<div class="small">Done: {% for st in steps %}{{ st.step }} {{ st.answer }}{{ ' → ' if not loop.last }}{% endfor %}</div>{% endif %}
+  </div>
+  {% if run.status == 'paused' %}
+    <div class="callout warn"><b>Paused for review.</b> {{ run.pause_reason }} No further instructions are shown.</div>
+  {% elif run.status == 'active' %}
+    <div class="card">
+      <div class="step-id">Step {{ node.node_key }}</div>
+      <div class="step-prompt">{{ node.prompt }}</div>
+      {% if passage %}<div>Evidence: <a class="cite" href="/evidence/{{ src.key }}/{{ passage.locator }}">{{ src.key }} · rev {{ src.revision }} · {{ passage.locator }}</a></div>
+      {% elif not node.citation_source %}<div class="small muted">Verification step</div>{% endif %}
+      <form method="post" action="/ui/runs/{{ run.key }}/respond" class="answers">
+        <input type="hidden" name="step" value="{{ node.node_key }}"><input type="hidden" name="version" value="{{ run.version }}"><input type="hidden" name="retry" value="{{ retry_key }}">
+        {% for a in node.edges %}<button name="answer" value="{{ a }}" {{ '' if mine else 'disabled' }}>{{ a|capitalize }}</button>{% endfor %}
+      </form>
+      {% if not mine %}<p class="small muted">Only the assigned technician ({{ case.assigned_tech_id|title }}) can answer this step.</p>{% endif %}
+    </div>
+    <form method="post" action="/ui/runs/{{ run.key }}/ask" class="card" id="ask">
+      <label for="q">Ask about this step</label>
+      <div class="row"><input type="text" id="q" name="question" placeholder="What am I looking for?" style="flex:1 1 200px"><button>Ask</button></div>
+      {% for msg in msgs %}{% if msg.role == 'assistant' and msg.payload and msg.payload.explainsStep %}<div class="msg small"><div class="kind answer">explains only</div>{{ msg.text }}</div>{% endif %}{% endfor %}
+    </form>
+  {% elif run.status == 'awaiting_outcome' %}
+    <form method="post" action="/ui/runs/{{ run.key }}/outcome" class="card">
+      <div class="callout ok"><b>Service restored.</b> Record what you did and how you verified it.</div>
+      <input type="hidden" name="version" value="{{ run.version }}">
+      <label for="action">Action taken</label><input type="text" id="action" name="action" value="Recorded indicator and self-test per {{ run.pathway_version.pathway.key }}; no parts replaced.">
+      <label for="verification">Verification note</label><input type="text" id="verification" name="verification" value="Doors cycled 10 times in simulator; no reopen; D17 cleared.">
+      <div class="row small"><span class="muted">Was step {{ order[0] }} helpful?</span><label><input type="radio" name="helpful" value="yes" checked> Yes</label><label><input type="radio" name="helpful" value="no"> No</label></div>
+      <button class="primary" {{ '' if mine else 'disabled' }}>Save verified outcome</button>
+    </form>
+  {% elif outcome %}
+    <div class="callout {{ 'ok' if outcome.kind == 'resolved' else 'warn' }}"><b>{{ 'Outcome recorded: resolved and verified.' if outcome.kind == 'resolved' else outcome.reason }}</b>
+      {% if outcome.open_question %}<br>Open question: {{ outcome.open_question }}<br><span class="small muted">Attempted steps and evidence travel with the escalation.</span>{% else %}<br><span class="small">The agent reviews the host update next.</span>{% endif %}</div>
+  {% endif %}
+</div>
+{% endblock %}

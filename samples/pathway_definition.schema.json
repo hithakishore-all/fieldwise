@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Fieldwise pathway definition",
+  "description": "Branches come only from this stored definition. Validation also checks: every allowed input has exactly one edge, every edge target exists, every node is reachable from start, there are no cycles, at least one terminal exists, escalations carry an open question, and citations point to a current passage of the same model and revision.",
+  "type": "object",
+  "required": ["start", "nodes"],
+  "properties": {
+    "start": {"type": "string"},
+    "nodes": {
+      "type": "object",
+      "additionalProperties": {
+        "oneOf": [
+          {"type": "object", "required": ["kind", "prompt", "inputs", "edges"],
+           "properties": {"kind": {"const": "step"}, "prompt": {"type": "string"},
+                          "citation": {"type": "object", "required": ["source", "locator"],
+                                       "properties": {"source": {"type": "string"}, "locator": {"type": "string"}}},
+                          "inputs": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+                          "edges": {"type": "object", "additionalProperties": {"type": "string"}}}},
+          {"type": "object", "required": ["kind", "outcome", "reason"],
+           "properties": {"kind": {"const": "terminal"}, "outcome": {"enum": ["resolved", "escalate"]},
+                          "reason": {"type": "string"}, "openQuestion": {"type": "string"}}}
+        ]
+      }
+    }
+  }
+}

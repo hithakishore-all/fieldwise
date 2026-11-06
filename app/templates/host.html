@@ -1,0 +1,16 @@
+{% extends "base.html" %}{% block title %}Service desk{% endblock %}
+{% block content %}
+<div class="host">
+  <div class="chrome"><span>Northline Service Desk (mock host)</span><span>Fieldwise runs embedded below · case data stays on the Fieldwise server</span></div>
+  <div class="side" style="padding:12px">
+    <nav class="caselist" aria-label="Host cases"><b class="small muted">MY CASES</b>
+      {% for c in cases %}<a href="/host/{{ c.key }}" class="{{ 'sel' if c.key == case.key }}"><b class="mono">{{ c.key }}</b><br><span class="muted">{{ c.intake_text }}</span></a>{% endfor %}
+      <div class="card small" style="margin-top:10px"><h3>Received by this host</h3>
+        {% if records %}{% for r in records %}<div><span class="mono">{{ r.receipt }}</span> · {{ r.case_key }} · {{ r.payload.outcome }}<br><span class="muted">{{ r.delivery_key }}</span></div>{% endfor %}
+        {% else %}<span class="muted">Nothing yet.</span>{% endif %}
+      </div>
+    </nav>
+    <iframe title="Fieldwise case workspace" src="/embed/cases/{{ case.key }}"></iframe>
+  </div>
+</div>
+{% endblock %}

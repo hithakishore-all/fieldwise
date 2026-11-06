@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{% block title %}Fieldwise{% endblock %} · Fieldwise</title>
+<link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700&family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:wght@400;600&display=swap">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body class="{% if embed %}embedded{% endif %}" style="--pc:var(--p-{{ actor.role if actor else 'agent' }})">
+{% if not embed %}
+<header class="topbar"><div class="in">
+  <a class="brand" href="/">{% include "_logo.svg" %}Fieldwise</a>
+  <nav class="nav" aria-label="Main">
+    {% if actor %}
+      {% if actor.role == 'agent' %}<a href="/host/C104">Service desk</a>{% endif %}
+      {% if actor.role == 'technician' %}<a href="/runs">My runs</a>{% endif %}
+      {% if actor.role == 'author' %}<a href="/knowledge">Knowledge</a>{% endif %}
+      {% if actor.role == 'reviewer' %}<a href="/review">Review</a>{% endif %}
+      <a href="/hierarchy">Hierarchy</a>
+    {% endif %}
+  </nav>
+  <div class="who">
+    <span class="demo">Demo identity</span>
+    {% if actor %}<span class="av">{{ actor.name[0] }}</span><span>{{ actor.name }} · {{ actor.role }} · {{ actor.tenant_id }}</span>
+    <a href="/login">Switch</a>{% else %}<a href="/login">Pick an identity</a>{% endif %}
+  </div>
+</div></header>
+{% endif %}
+<main class="wrap">
+  {% if flash %}<div class="flash {{ flash.kind }}" role="status">{{ flash.text }}</div>{% endif %}
+  {% block content %}{% endblock %}
+  {% if not embed %}<p class="small muted">Synthetic demo: all equipment, manuals, procedures and people are fictional. The assistant uses scripted retrieval and response templates, not a live model.</p>{% endif %}
+</main>
+</body>
+</html>

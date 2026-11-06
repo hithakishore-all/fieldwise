@@ -1,0 +1,103 @@
+{% extends "base.html" %}{% block title %}{{ case.key }}{% endblock %}
+{% block content %}
+{% set owner = actor and actor.id == case.owner_id %}
+<div class="{{ '' if embed else 'side' }}">
+  {% if not embed %}
+  <nav class="caselist" aria-label="Cases">
+    <b class="small muted">CASES · {{ actor.tenant_id|upper }}</b>
+    {% for c in cases %}<a href="/cases/{{ c.key }}" class="{{ 'sel' if c.key == case.key }}"><b class="mono">{{ c.key }}</b><br><span class="muted">{{ c.title }} · {{ c.status }}</span></a>{% endfor %}
+  </nav>
+  {% endif %}
+  <div class="stack" style="gap:14px">
+    <section class="card" aria-labelledby="h-intake">
+      <div class="row" style="justify-content:space-between"><h2 id="h-intake">{{ case.key }} · {{ case.title }}</h2>
+        <span class="row small"><span class="chip {{ case.status }}">{{ case.status }}</span><span class="muted">owner {{ case.owner_id|title }} · case version {{ case.version }}</span></span></div>
+      <div class="quote">“{{ case.intake_text }}”<div class="small muted">Caller’s words, stored verbatim · observed</div></div>
+      <div class="facts">
+        <div class="fact"><div class="k">Asset</div><div class="v">{{ case.asset.key }} <span class="chip observed">observed</span></div></div>
+        <div class="fact"><div class="k">Serial</div><div class="v">{{ case.asset.serial }} <span class="chip observed">observed</span></div></div>
+        <div class="fact"><div class="k">Site</div><div class="v">{{ case.asset.site }} · {{ case.asset.location }}</div></div>
+        <div class="fact"><div class="k">Model</div><div class="v">{% if case.model %}Model {{ case.model }} <span class="chip confirmed">confirmed</span>{% else %}— <span class="chip unknown">unknown</span>{% endif %}</div></div>
+        <div class="fact"><div class="k">Revision</div><div class="v">{% if case.revision %}rev {{ case.revision }} <span class="chip confirmed">confirmed</span>{% else %}— <span class="chip unknown">unknown</span>{% endif %}</div></div>
+      </div>
+      {% for i in infs %}<div class="fact"><div class="k">Hypothesis {{ i.key }}</div><div class="v">{{ i.text }} <span class="chip inferred">inferred</span> <span class="muted small">{{ i.status }}{% if i.status == 'open' and i.pending_check %}, pending check {{ i.pending_check }}{% endif %}</span></div></div>{% endfor %}
+      {% if owner %}
+      <form method="post" action="/ui/cases/{{ case.key }}/confirm" class="callout {{ 'warn' if not case.model else '' }}">
+        <div class="row"><b>{{ 'Confirm applicability' if not case.model else 'Correct applicability' }}</b>
+          <span class="small muted">Model and revision come from a person, never from the serial or a guess.{% if case.model %} Correcting them pauses any active run.{% endif %}</span></div>
+        <div class="row" style="margin-top:6px">
+          <label for="model">Model</label><select id="model" name="model"><option value="">Choose</option>{% for x in ['A','B','C'] %}<option value="{{ x }}" {{ 'selected' if case.model == x }}>Model {{ x }}</option>{% endfor %}</select>
+          <label for="revision">Revision</label><select id="revision" name="revision"><option value="">Choose</option>{% for x in ['1','2','3'] %}<option value="{{ x }}" {{ 'selected' if case.revision == x }}>rev {{ x }}</option>{% endfor %}</select>
+          <input type="hidden" name="version" value="{{ case.version }}"><button class="primary">{{ 'Confirm' if not case.model else 'Save correction' }}</button></div>
+      </form>
+      {% endif %}
+    </section>
+
+    <section class="card" id="chat" aria-labelledby="h-chat">
+      <h2 id="h-chat">Assistant</h2>
+      {% if msgs %}<div class="chat" aria-live="polite">
+      {% for msg in msgs %}
+        {% if msg.role == 'user' %}<div class="msg user">{{ msg.text }}</div>
+        {% else %}{% set r = msg.payload %}<div class="msg"><div class="kind {{ r.kind }}">{{ r.kind }}</div>{{ r.text }}
+          {% if r.citations %}<div class="row small" style="margin-top:6px">Evidence: {% for c in r.citations %}<a class="cite" href="{{ c.url }}">{{ c.sourceId }} · rev {{ c.revision }} · {{ c.locator }}</a>{% endfor %}</div>{% endif %}
+          {% if r.history and r.history.total %}<div class="small" style="margin-top:4px"><b>{{ r.history.label }}</b>: {% for h in r.history.cases %}<a href="{{ h.url }}">{{ h.id }}</a>{{ ' · ' if not loop.last }}{% endfor %} <span class="muted">· past cases support a hypothesis, never authorize a step</span></div>{% endif %}
+          {% if r.missingFields %}<div class="small muted">Missing: {{ r.missingFields|join(', ') }} · model-specific steps returned: 0</div>{% endif %}
+        </div>{% endif %}
+      {% endfor %}</div>
+      {% else %}<p class="muted small">No conversation on {{ case.key }} yet. Each case keeps its own history.</p>{% endif %}
+      <form method="post" action="/ui/cases/{{ case.key }}/ask" class="row">
+        <input type="hidden" name="version" value="{{ case.version }}">
+        <input type="text" name="question" aria-label="Question" placeholder="Ask about this case" value="{{ 'What does D17 mean here?' if case.key == 'C104' else '' }}" style="flex:1 1 220px">
+        <button>Ask</button>
+      </form>
+    </section>
+
+    <section class="card" aria-labelledby="h-proc">
+      <h2 id="h-proc">Procedure</h2>
+      {% if run %}
+        <div class="row"><span class="mono">{{ run.key }}</span><span class="chip {{ run.status }}">{{ run.status|replace('_',' ') }}</span>
+          <span class="small muted">pinned to {{ run.pathway_version.pathway.key }} v{{ run.pathway_version.version }} · step {{ run.current_node }} · run version {{ run.version }} · technician {{ case.assigned_tech_id|title }}</span>
+          <a href="/runs/{{ run.key }}" target="_top">Open run</a></div>
+        {% if run.status == 'paused' %}<div class="callout warn"><b>Paused for review.</b> {{ run.pause_reason }}</div>{% endif %}
+      {% endif %}
+      {% if owner and case.status == 'open' and (not run or run.status == 'paused') %}
+        {% if elig %}
+        <form method="post" action="/ui/cases/{{ case.key }}/start" class="row">
+          <input type="hidden" name="version" value="{{ case.version }}">
+          <label for="pathway">Approved procedure</label><select id="pathway" name="pathway">{% for p, v in elig %}<option value="{{ p.key }}">{{ p.key }} v{{ v.version }} · {{ p.name }}</option>{% endfor %}</select>
+          <label for="technician">Technician</label><select id="technician" name="technician">{% for t in techs %}<option value="{{ t.id }}">{{ t.name }}</option>{% endfor %}</select>
+          <button class="primary">Start and assign</button>
+        </form>
+        {% elif not run %}<p class="small muted">Locked until model and revision are confirmed and an approved, current procedure applies.</p>{% endif %}
+      {% endif %}
+    </section>
+
+    {% if outcome %}
+    <section class="card" aria-labelledby="h-close">
+      <h2 id="h-close">Close and send to host</h2>
+      <div class="callout {{ 'ok' if outcome.kind == 'resolved' else 'warn' }}"><b>{{ 'Resolved and verified' if outcome.kind == 'resolved' else 'Escalated' }}</b> · {{ outcome.verification or outcome.open_question }}</div>
+      <h3>Host update preview</h3>
+<pre class="preview">Case {{ summary.case }} · asset {{ summary.asset }} · {{ summary.applicability }}
+Caller: “{{ summary.callerWords }}”
+Procedure: {{ summary.procedure }}, run {{ summary.run }}
+Attempted steps:
+{% for a in summary.attemptedSteps %}  {{ a.step }}: {{ a.answer }}{% if a.citation %} ({{ a.citation }}){% endif %}
+{% endfor %}Outcome: {{ summary.outcome }} · {{ summary.reason }}
+{% if summary.actionTaken %}Action: {{ summary.actionTaken }}
+{% endif %}{% if summary.verification %}Verification: {{ summary.verification }}{% else %}Open question: {{ summary.openQuestion }}{% endif %}</pre>
+      {% if not delivery %}
+        {% if owner %}<form method="post" action="/ui/cases/{{ case.key }}/approve" class="row"><button class="primary">Approve and queue for host</button><span class="small muted">Nothing is written to the host until you approve.</span></form>{% endif %}
+      {% else %}
+        <div class="row"><span class="mono">{{ delivery.delivery_key }}</span><span class="chip {{ delivery.status }}">{{ delivery.status }}</span><span class="small muted">attempts {{ delivery.attempts }}{% if delivery.receipt %} · receipt <span class="mono">{{ delivery.receipt }}</span>{% endif %}{% if delivery.last_error %} · {{ delivery.last_error }}{% endif %}</span></div>
+        {% if actor.role == 'agent' %}
+        <div class="row">
+          <form method="post" action="/ui/deliveries/{{ delivery.delivery_key }}/send"><input type="hidden" name="next" value="{{ '/embed' if embed else '' }}/cases/{{ case.key }}"><button class="primary">{{ 'Send to host' if delivery.attempts == 0 else 'Retry delivery' }}</button></form>
+          <form method="post" action="/ui/host/failure"><input type="hidden" name="next" value="{{ '/embed' if embed else '' }}/cases/{{ case.key }}"><input type="hidden" name="fail" value="{{ '0' if fail_next else '1' }}"><button>{{ 'Cancel simulated outage' if fail_next else 'Simulate host outage on next send' }}</button></form>
+        </div>{% endif %}
+      {% endif %}
+    </section>
+    {% endif %}
+    {% if actor.role in ['reviewer','agent'] %}<p class="small"><a href="/review/cases/{{ case.key }}" target="_top">Open the ordered trace for {{ case.key }}</a></p>{% endif %}
+  </div>
+</div>
+{% endblock %}

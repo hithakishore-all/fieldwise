@@ -1,0 +1,12 @@
+{% extends "base.html" %}{% block title %}{{ h.key }}{% endblock %}
+{% block content %}
+<div class="card" style="max-width:640px">
+  <h1>{{ h.key }} · D17 on Model {{ h.model }} rev {{ h.revision }}</h1>
+  <p>{{ h.summary }}</p>
+  <div class="tbl"><table><thead><tr><th>Attempt</th><th>Action</th><th>Result</th></tr></thead><tbody>
+  {% for a in h.attempts %}<tr><td class="num">{{ loop.index }}</td><td>{{ a.action }}</td><td>{{ a.result }}</td></tr>{% endfor %}</tbody></table></div>
+  <p>Outcome: <span class="chip {{ 'resolved' if h.outcome == 'verified_recovery' else 'unknown' }}">{{ h.outcome|replace('_',' ') }}</span></p>
+  <p class="small muted">Only the attempt that was verified counts as the fix. History can support a hypothesis; it never authorizes a step.</p>
+  <p><a href="javascript:history.back()">Back</a></p>
+</div>
+{% endblock %}

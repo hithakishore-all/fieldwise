@@ -4,4 +4,6 @@ __pycache__/
 *.pyc
 .venv/
 *.db
+*.db-journal
+.pytest_cache/
 .DS_Store

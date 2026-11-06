@@ -1,0 +1,23 @@
+{% extends "base.html" %}{% block title %}Pick a demo identity{% endblock %}
+{% block content %}
+<div class="card">
+  <h1>Pick a demo identity</h1>
+  <p class="muted">This picker is a <b>demo feature</b> standing in for real sign-in. Your choice is kept in a server-side session, and every permission is checked on the server.</p>
+  <form method="post" action="/demo/login" class="persona-list">
+    <input type="hidden" name="next" value="{{ next }}">
+    {% for u, mem in people %}
+    <button name="user_id" value="{{ u.id }}" style="--pc:var(--p-{{ mem.role }})"><span class="av">{{ u.name[0] }}</span>
+      <span><b>{{ u.name }}</b><span class="small muted">{{ u.title }} · tenant {{ mem.tenant_id }}</span></span></button>
+    {% endfor %}
+  </form>
+</div>
+<div class="card small">
+  <h3>Five-minute walkthrough</h3>
+  <ol style="margin:0;padding-left:18px">
+    <li><b>Ana</b>: on the service desk, ask about D17, confirm Model B rev 2, ask again, then start PB2 and assign Teo.</li>
+    <li><b>Teo</b>: open My runs on a phone-width window, answer each step, then record the verified outcome.</li>
+    <li><b>Ana</b>: approve the host update, switch on the simulated outage, send, then retry.</li>
+    <li><b>Ren</b>: open the case trace, or withdraw a procedure. <b>Ari</b>: import the sample manifest.</li>
+  </ol>
+</div>
+{% endblock %}

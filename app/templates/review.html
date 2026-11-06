@@ -1,0 +1,47 @@
+{% extends "base.html" %}{% block title %}Review{% endblock %}
+{% block content %}
+<h1>Review</h1>
+<section class="card" aria-labelledby="h-pv">
+  <h2 id="h-pv">Procedures</h2>
+  {% for p in paths %}
+  <div class="card">
+    <div class="row" style="justify-content:space-between"><b>{{ p.key }} · {{ p.name }}</b><span class="small muted">Model {{ p.model }} rev {{ p.revision }}</span></div>
+    {% for v in p.versions|reverse %}
+    <details {{ 'open' if v.status == 'draft' }}>
+      <summary class="row"><span>v{{ v.version }}</span><span class="chip {{ v.status }}">{{ v.status }}</span><span class="small muted">author {{ v.author_id|title }}{% if v.reviewer_id %} · published by {{ v.reviewer_id|title }}{% endif %} · {{ runs|selectattr('pathway_version_id','equalto',v.id)|list|length }} run(s)</span></summary>
+      <div class="tbl"><table><thead><tr><th>Node</th><th>Prompt or reason</th><th>Evidence</th><th>Branches</th></tr></thead><tbody>
+      {% for k, n in v.definition.nodes.items() %}<tr><td class="mono">{{ k }}</td><td>{{ n.prompt or n.reason }}{% if n.openQuestion %}<br><span class="small muted">Open question: {{ n.openQuestion }}</span>{% endif %}</td>
+        <td>{% if n.citation %}<span class="mono">{{ n.citation.source }} {{ n.citation.locator }}</span>{% endif %}</td>
+        <td class="small">{% if n.edges %}{% for a, t in n.edges.items() %}{{ a }} → <b>{{ t }}</b>{{ ', ' if not loop.last }}{% endfor %}{% else %}<span class="chip {{ 'resolved' if n.outcome == 'resolved' else 'escalated' }}">{{ n.outcome }}</span>{% endif %}</td></tr>{% endfor %}
+      </tbody></table></div>
+      {% if v.status == 'draft' %}
+        {% set errs = checks[(p.key, v.version)] %}
+        {% if errs %}<div class="callout bad small"><b>Cannot publish yet.</b> {{ errs|join(' ') }}</div>{% endif %}
+        <form method="post" action="/ui/pathways/{{ p.key }}/{{ v.version }}/publish"><button class="primary">Publish v{{ v.version }}</button></form>
+      {% elif v.status == 'published' %}
+        <form method="post" action="/ui/pathways/{{ p.key }}/{{ v.version }}/withdraw"><button class="warn">Withdraw v{{ v.version }}</button></form>
+      {% endif %}
+    </details>
+    {% endfor %}
+  </div>
+  {% endfor %}
+</section>
+<div class="grid2">
+  <section class="card" aria-labelledby="h-src">
+    <h2 id="h-src">Evidence</h2>
+    <div class="tbl"><table><thead><tr><th>Source</th><th>Applies to</th><th>Status</th><th></th></tr></thead><tbody>
+    {% for x in srcs %}<tr><td class="mono">{{ x.key }}</td><td>Model {{ x.model }} rev {{ x.revision }}</td><td><span class="chip {{ x.status }}">{{ x.status }}</span></td>
+      <td>{% if x.status == 'current' %}<form method="post" action="/ui/sources/{{ x.key }}/withdraw"><button class="warn">Withdraw</button></form>{% endif %}</td></tr>{% endfor %}
+    </tbody></table></div>
+    <p class="small muted">Withdrawing a source removes it from answers and pauses any run whose procedure cites it.</p>
+  </section>
+  <section class="card" aria-labelledby="h-fb">
+    <h2 id="h-fb">Step feedback</h2>
+    {% if fb %}<div class="tbl"><table><thead><tr><th>Run</th><th>Step</th><th>Helpful</th><th>Comment</th></tr></thead><tbody>
+    {% for f, r in fb %}<tr><td class="mono">{{ r.key }}</td><td>{{ f.step_id }}</td><td>{{ 'yes' if f.helpful else 'no' }}</td><td>{{ f.comment or '' }}</td></tr>{% endfor %}</tbody></table></div>
+    {% else %}<p class="small muted">No feedback yet.</p>{% endif %}
+    <h3>Case traces</h3>
+    <div class="row">{% for c in cases %}<a class="btn" href="/review/cases/{{ c.key }}">{{ c.key }}</a>{% endfor %}</div>
+  </section>
+</div>
+{% endblock %}

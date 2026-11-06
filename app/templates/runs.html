@@ -1,0 +1,9 @@
+{% extends "base.html" %}{% block title %}My runs{% endblock %}
+{% block content %}
+<div class="card"><h1>{{ 'My runs' if actor.role == 'technician' else 'Runs' }}</h1>
+{% if rows %}<div class="tbl"><table><thead><tr><th>Run</th><th>Case</th><th>Procedure</th><th>Step</th><th>Status</th></tr></thead><tbody>
+{% for r, c in rows %}<tr><td><a href="/runs/{{ r.key }}" class="mono">{{ r.key }}</a></td><td>{{ c.key }} · {{ c.title }}</td><td>{{ r.pathway_version.pathway.key }} v{{ r.pathway_version.version }}</td><td>{{ r.current_node }}</td><td><span class="chip {{ r.status }}">{{ r.status|replace('_',' ') }}</span></td></tr>{% endfor %}
+</tbody></table></div>
+{% else %}<p class="muted">Nothing assigned to you yet. A support agent starts a procedure and assigns it.</p>{% endif %}
+</div>
+{% endblock %}

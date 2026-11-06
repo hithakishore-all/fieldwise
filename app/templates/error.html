@@ -1,0 +1,2 @@
+{% extends "base.html" %}{% block title %}{{ status }}{% endblock %}
+{% block content %}<div class="card"><h1>{{ "Not found" if status == 404 else "Not allowed" if status == 403 else "Something needs attention" }}</h1><p>{{ message }}</p><p><a href="/">Back to Fieldwise</a></p></div>{% endblock %}

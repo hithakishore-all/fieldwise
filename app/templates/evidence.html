@@ -1,0 +1,11 @@
+{% extends "base.html" %}{% block title %}{{ src.key }} {{ p.locator }}{% endblock %}
+{% block content %}
+<div class="card" style="max-width:640px">
+  <div class="row small muted" style="justify-content:space-between"><span class="mono">{{ src.key }} · {{ src.title }}</span><span class="mono">rev {{ src.revision }} · page {{ p.page }} ({{ p.locator }})</span></div>
+  <p style="font-size:19px">{{ p.text }}</p>
+  <div class="facts"><div class="fact"><div class="k">Applies to</div><div class="v">Model {{ src.model }} rev {{ src.revision }}</div></div>
+    <div class="fact"><div class="k">Status</div><div class="v"><span class="chip {{ src.status }}">{{ src.status }}</span></div></div></div>
+  <p class="small muted">Citation stored as source revision plus page locator. Fictional simulator manual.</p>
+  <p><a href="javascript:history.back()">Back</a></p>
+</div>
+{% endblock %}

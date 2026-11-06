@@ -1,0 +1,18 @@
+{% extends "base.html" %}{% block title %}Hierarchy{% endblock %}
+{% macro tree(items) %}<ul>{% for n in items %}<li><div class="hnode"><b>{{ n.name }} <span class="mono muted">{{ n.key }}</span></b>
+  {% if n.faultCodes %}<span class="meta">Fault codes: {% for c in n.faultCodes %}{{ c.code }} (aliases {{ c.aliases|join(', ') }}){% endfor %}{% if n.templates %} · templates {{ n.templates|join(', ') }}{% endif %}</span>{% endif %}
+  {% if n.kind == 'revision' %}<span class="meta">Manuals: {% for x in n.sources %}{{ x.key }} <span class="chip {{ x.status }}">{{ x.status }}</span> {% else %}none{% endfor %}</span>
+  <span class="meta">Procedures: {% for p in n.pathways %}{{ p.key }} ({{ p.versions|join(', ') }}) {% else %}none{% endfor %}</span>{% endif %}
+  </div>{% if n.children %}{{ tree(n.children) }}{% endif %}</li>{% endfor %}</ul>{% endmacro %}
+{% block content %}
+<h1>Hierarchy</h1>
+<p class="muted">Fault codes live on the family, so D17 alone can’t pick a fix. Manuals and procedures attach to one revision and apply only there. Each asset links to one revision node, and only after a person confirms it.</p>
+<div class="grid2">
+  <section class="card"><h2>Products</h2><div class="tree">{{ tree(products) }}</div></section>
+  <section class="card"><h2>Assets</h2>
+    {% for site in assets %}<div class="tree"><ul><li><div class="hnode"><b>{{ site.site }}</b></div><ul>
+      {% for x in site.assets %}<li><div class="hnode"><b>{{ x.location }} · {{ x.key }}</b><span class="meta">Serial {{ x.serial }} · {% if x.product %}→ {{ x.product }} <span class="chip confirmed">confirmed</span>{% else %}product node unknown <span class="chip unknown">unknown</span>{% endif %}</span></div></li>{% endfor %}
+    </ul></li></ul></div>{% endfor %}
+  </section>
+</div>
+{% endblock %}

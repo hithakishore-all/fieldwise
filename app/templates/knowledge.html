@@ -1,0 +1,53 @@
+{% extends "base.html" %}{% block title %}Knowledge{% endblock %}
+{% block content %}
+<h1>Knowledge</h1>
+<div class="grid2">
+  <section class="card" id="import" aria-labelledby="h-imp">
+    <h2 id="h-imp">Import a manifest</h2>
+    <p class="small muted">Structured JSON only. Your tenant comes from your sign-in. Importing the same file twice changes nothing. Schema: <span class="mono">samples/import_manifest.schema.json</span>.</p>
+    <form method="post" action="/ui/imports" class="stack">
+      <label for="manifest">Manifest (sample loaded, including one malformed record)</label>
+      <textarea id="manifest" name="manifest" rows="12">{{ sample }}</textarea>
+      <div class="row"><button class="primary">Import</button></div>
+    </form>
+    {% for j in jobs %}
+    <div class="card small"><b>Job {{ j.id }}</b> · {{ j.accepted|length }} accepted · {{ j.rejected|length }} rejected <span class="mono muted">sha {{ j.checksum[:10] }}</span>
+      <div class="tbl"><table><thead><tr><th>Record</th><th>Result</th></tr></thead><tbody>
+      {% for r in j.accepted %}<tr><td class="mono">{{ r.record }}</td><td><span class="chip accepted">{{ r.result }}</span> {{ r.passages }} passage(s)</td></tr>{% endfor %}
+      {% for r in j.rejected %}<tr><td class="mono">{{ r.record }}</td><td><span class="chip rejected">rejected</span> {{ r.reasons|join(' ') }}</td></tr>{% endfor %}
+      </tbody></table></div></div>
+    {% endfor %}
+  </section>
+  <section class="card" aria-labelledby="h-src">
+    <h2 id="h-src">Sources</h2>
+    <div class="tbl"><table><thead><tr><th>Source</th><th>Applies to</th><th>Pages</th><th>Status</th></tr></thead><tbody>
+    {% for x in srcs %}<tr><td class="mono">{{ x.key }}</td><td>Model {{ x.model }} rev {{ x.revision }}</td><td>{% for p in x.passages %}<a class="cite" href="/evidence/{{ x.key }}/{{ p.locator }}">{{ p.locator }}</a> {% endfor %}</td><td><span class="chip {{ x.status }}">{{ x.status }}</span></td></tr>{% endfor %}
+    </tbody></table></div>
+    <form method="get" action="/knowledge" class="row"><input type="text" name="q" value="{{ q }}" placeholder="Search current passages" aria-label="Search" style="flex:1"><button>Search</button></form>
+    {% if q %}<p class="small">{{ results|length }} result(s) for “{{ q }}”.</p>{% for r in results %}<div class="small"><a class="cite" href="{{ r.url }}">{{ r.sourceId }} {{ r.locator }}</a> {{ r.text }}</div>{% endfor %}{% endif %}
+  </section>
+</div>
+<section class="card" id="editor" aria-labelledby="h-ed">
+  <div class="row" style="justify-content:space-between"><h2 id="h-ed">Pathway editor</h2>
+    <span class="row small">{% for p in paths %}<a href="/knowledge?edit={{ p.key }}#editor" class="btn">{{ p.key }}</a>{% endfor %}</span></div>
+  {% if edit %}
+  <p class="small muted">{{ edit.key }} · {{ edit.name }} · versions: {% for v in edit.versions %}v{{ v.version }} <span class="chip {{ v.status }}">{{ v.status }}</span> {% endfor %}. Saving creates or updates the draft; published versions never change. A different person must publish it.</p>
+  {% if errors %}<div class="callout bad"><b>{{ errors|length }} validation error(s)</b><ul style="margin:4px 0 0;padding-left:18px">{% for e in errors %}<li>{{ e }}</li>{% endfor %}</ul></div>{% endif %}
+  <form method="post" action="/ui/pathways/{{ edit.key }}/draft" class="stack">
+    <label for="definition">Structured definition (JSON)</label>
+    <textarea id="definition" name="definition" rows="18">{{ draft_def }}</textarea>
+    <div class="row"><button class="primary">Validate and save draft</button></div>
+  </form>
+  {% endif %}
+</section>
+<section class="card" id="templates" aria-labelledby="h-tp">
+  <h2 id="h-tp">Templates</h2>
+  {% for t in tpls %}
+  <form method="post" action="/ui/templates/{{ t.key }}/apply" class="row">
+    <b>{{ t.key }}</b><span class="muted small">{{ t.name }} · defined at family level; each slot binds to the revision’s own cited page</span>
+    <label for="node-{{ t.key }}">Apply to</label><select id="node-{{ t.key }}" name="node">{% for r in revs %}<option value="{{ r.key }}">{{ r.key }}</option>{% endfor %}</select>
+    <button>Apply template</button>
+  </form>
+  {% endfor %}
+</section>
+{% endblock %}

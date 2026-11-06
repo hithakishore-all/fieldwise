@@ -1,0 +1,16 @@
+{% extends "base.html" %}{% block title %}{{ case.key }} trace{% endblock %}
+{% block content %}
+<h1>{{ case.key }} · how this case got here</h1>
+{% for r in t.runs %}
+<section class="card"><h2>{{ r.runId }} · {{ r.pathway }} <span class="chip {{ r.status }}">{{ r.status|replace('_',' ') }}</span></h2>
+  <div class="tbl"><table><thead><tr><th>Step</th><th>Prompt</th><th>Evidence</th><th>Answer</th><th>Next</th><th>By</th></tr></thead><tbody>
+  {% for a in r.attemptedSteps %}<tr><td class="mono">{{ a.step }}</td><td>{{ a.prompt }}</td><td class="mono">{{ a.citation or '' }}</td><td><b>{{ a.answer }}</b></td><td class="mono">{{ a.next }}</td><td>{{ a.by|title }}</td></tr>{% endfor %}
+  </tbody></table></div></section>
+{% endfor %}
+{% for o in t.outcomes %}<div class="callout {{ 'ok' if o.kind == 'resolved' else 'warn' }}"><b>Outcome: {{ o.kind }}</b> at {{ o.terminal }} · {{ o.reason }}{% if o.verification %} · Verification: {{ o.verification }}{% endif %}{% if o.openQuestion %} · Open question: {{ o.openQuestion }}{% endif %}</div>{% endfor %}
+{% if t.feedback %}<section class="card"><h2>Step feedback</h2>{% for f in t.feedback %}<div class="small">{{ f.step }}: {{ 'helpful' if f.helpful else 'not helpful' }} · {{ f.by|title }}{% if f.comment %} · {{ f.comment }}{% endif %}</div>{% endfor %}</section>{% endif %}
+<section class="card"><h2>Ordered audit trail</h2>
+  <div class="tbl"><table><thead><tr><th>#</th><th>Who</th><th>What</th><th>Detail</th></tr></thead><tbody>
+  {% for e in t.events %}<tr><td class="num mono">{{ e.seq }}</td><td>{{ (e.actor or 'system')|title }}</td><td class="mono">{{ e.action }}</td><td class="small">{% for k, v in e.detail.items() %}{% if v not in [None, '', []] %}<b>{{ k }}</b> {{ v }}{{ ' · ' if not loop.last }}{% endif %}{% endfor %}</td></tr>{% endfor %}
+  </tbody></table></div></section>
+{% endblock %}
