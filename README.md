@@ -8,7 +8,9 @@ Fieldwise carries one equipment problem from the support call to a verified fix 
 
 > **All data is fictional.** Every elevator model, manual, procedure, company and person is invented for this demo. The in-app assistant uses scripted retrieval and response templates, not a live model.
 
-**Live demo (no install):** https://hithakishore-all.github.io/fieldwise/ opens with a 3-minute captioned video of the working app, then a click-through version.
+**Watch the 3-minute walkthrough:** https://www.loom.com/share/b216065fed444a60976e9811e9ec1994 (captioned, no sound)
+
+**Live demo (no install):** https://hithakishore-all.github.io/fieldwise/
 
 ## Contents
 
