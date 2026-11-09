@@ -8,7 +8,7 @@ Fieldwise carries one equipment problem from the support call to a verified fix 
 
 > **All data is fictional.** Every elevator model, manual, procedure, company and person is invented for this demo. The in-app assistant uses scripted retrieval and response templates, not a live model.
 
-**Live guided demo (no install):** https://hithakishore-all.github.io/fieldwise/
+**Live demo (no install):** https://hithakishore-all.github.io/fieldwise/ opens with a 3-minute captioned video of the working app, then a click-through version.
 
 ## Contents
 
@@ -172,6 +172,7 @@ Details, data model and state diagrams: [docs/ARCHITECTURE.md](docs/ARCHITECTURE
 | Start | `make start` | `.venv/bin/python -m app.cli start` |
 | Test | `make test` | `.venv/bin/python -m pytest -q` |
 | Reset demo data | `make reset` | `.venv/bin/python -m app.cli reset` |
+| Re-record the walkthrough video | `make video` | `.venv/bin/python scripts/record_walkthrough.py .walkthrough` then `scripts/encode_walkthrough.py` |
 | Check database | `make check` | `.venv/bin/python -m app.cli check` |
 | Zero-setup run | `make offline` | set `DATABASE_URL=sqlite:///./fieldwise.db`, then `reset` and `start` |
 

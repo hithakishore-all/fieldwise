@@ -5,7 +5,7 @@ BIN := $(VENV)/bin
 -include .env
 export
 
-.PHONY: setup seed start test reset check offline
+.PHONY: setup seed start test reset check offline video
 
 setup:            ## create .venv and install pinned dependencies
 	$(PY) -m venv $(VENV)
@@ -31,3 +31,7 @@ check:            ## show which database is configured and whether it answers
 offline:          ## zero-setup run on a local SQLite file, no PostgreSQL needed
 	DATABASE_URL=sqlite:///./fieldwise.db $(BIN)/python -m app.cli reset
 	DATABASE_URL=sqlite:///./fieldwise.db $(BIN)/python -m app.cli start
+
+video:            ## re-record the captioned walkthrough video into docs/walkthrough/
+	$(BIN)/python scripts/record_walkthrough.py .walkthrough
+	$(BIN)/python scripts/encode_walkthrough.py .walkthrough docs/walkthrough/fieldwise-walkthrough.mp4 docs/walkthrough/poster.jpg
