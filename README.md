@@ -313,4 +313,4 @@ More in [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md).
 
 ## License
 
-MIT, see [LICENSE](LICENSE). Built by Hitha Kishore.
+Apache 2.0, see [LICENSE](LICENSE). Built by Hitha Kishore.
